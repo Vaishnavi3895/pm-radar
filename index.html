@@ -1431,9 +1431,12 @@ function renderJobContent(j) {
     db.innerHTML = jobHdr + '<div class="sec"><div class="sl">Go-to-market strategy</div>' +
       j.gtm.map(function(g){return '<div class="gs"><div class="gnum">'+g.n+'</div><div><div class="gtitle">'+g.t+'</div><div class="gbody">'+g.b+'</div><div class="gtag">'+g.tg+'</div></div></div>';}).join("") + '</div>';
   } else if (activeJobTab === "angle") {
+    var angleIcons = ["🎯","📬","💡","⚡"];
     db.innerHTML = jobHdr + '<div class="sec"><div class="sl">Your BD-to-PM entry path</div>' +
       '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">' +
-      j.angle.map(function(a){return '<div class="as"><div class="ae">'+a.e+'</div><div><div class="atitle">'+a.t+'</div><div class="abody">'+a.b+'</div></div></div>';}).join("") + '</div></div>';
+      j.angle.map(function(a,i){
+        return '<div class="as"><div class="ae">' + angleIcons[i] + '</div><div class="angle-body"><div class="atitle">' + a.t + '</div><div class="abody">' + a.b + '</div></div></div>';
+      }).join("") + '</div></div>';
   } else if (activeJobTab === "prep") {
     db.innerHTML = jobHdr + '<div class="sec"><div class="sl">Interview questions to prepare</div>' +
       j.questions.map(function(q){return '<div class="qi"><div class="qcat">'+q.c+'</div><div class="qtext">'+q.q+'</div><div class="qhint">&#128161; '+q.h+'</div></div>';}).join("") + '</div>';
