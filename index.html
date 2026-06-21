@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PM Radar — Your weekly pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0F1A;--surface:#131929;--card:#1A2236;--card-hover:#1F2A40;--border:rgba(255,255,255,0.07);--border-strong:rgba(255,255,255,0.13);--text:#F5F2EB;--text-secondary:#8A93A8;--text-muted:#4E5A70;--teal:#00C9A7;--teal-dim:rgba(0,201,167,0.10);--teal-glow:rgba(0,201,167,0.22);--amber:#F5A623;--amber-dim:rgba(245,166,35,0.10);--purple:#A78BFA;--purple-dim:rgba(167,139,250,0.10);--blue:#60A5FA;--blue-dim:rgba(96,165,250,0.10);--coral:#FF6B6B;--coral-dim:rgba(255,107,107,0.10);--green:#4ADE80;--green-dim:rgba(74,222,128,0.10);--mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--serif:'Fraunces',serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+/* TICKER */
+.ticker-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:9px 0;overflow:hidden;position:sticky;top:0;z-index:100;}
+.ticker-inner{display:flex;animation:ticker 50s linear infinite;white-space:nowrap;}
+.ticker-inner:hover{animation-play-state:paused;}
+.ticker-item{display:inline-flex;align-items:center;gap:8px;padding:0 24px;font-family:var(--mono);font-size:11px;color:var(--text-secondary);border-right:1px solid var(--border);flex-shrink:0;}
+.tdot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.tdot.funded{background:var(--teal);}.tdot.hiring{background:var(--amber);}.tdot.news{background:var(--purple);}
+.tamount{color:var(--teal);font-weight:500;}
+@keyframes ticker{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+/* HEADER */
+.header{padding:20px 40px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.header h1{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--text);}
+.header h1 em{font-style:italic;color:var(--teal);}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.live-pill{display:inline-flex;align-items:center;gap:6px;background:var(--teal-dim);border:1px solid var(--teal-glow);border-radius:20px;padding:4px 12px;font-size:11px;font-family:var(--mono);color:var(--teal);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+/* WEEK TABS */
+.week-nav{display:flex;border-bottom:1px solid var(--border);background:var(--surface);padding:0 24px;}
+.week-tab{padding:10px 18px;font-size:12px;font-family:var(--mono);color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
+.week-tab:hover{color:var(--text-secondary);}
+.week-tab.active{color:var(--teal);border-bottom-color:var(--teal);}
+.week-tab .wcount{background:var(--teal-dim);color:var(--teal);border-radius:10px;padding:1px 7px;font-size:10px;}
+.week-tab .acount{background:var(--surface);color:var(--text-muted);border:1px solid var(--border);border-radius:10px;padding:1px 7px;font-size:10px;}
+.new-banner{background:linear-gradient(90deg,var(--teal-dim),transparent);border-bottom:1px solid var(--teal-glow);padding:8px 40px;font-size:12px;color:var(--teal);font-family:var(--mono);display:none;align-items:center;gap:10px;}
+.new-banner.show{display:flex;}
+/* FILTERS */
+.filters{padding:12px 24px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.filter-label{font-size:11px;font-family:var(--mono);color:var(--text-muted);margin-right:4px;}
+.filter-btn{border:1px solid var(--border-strong);border-radius:20px;padding:4px 13px;font-size:12px;color:var(--text-secondary);background:transparent;cursor:pointer;transition:all 0.15s;font-family:var(--sans);}
+.filter-btn:hover{border-color:var(--teal);color:var(--teal);}
+.filter-btn.active{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+.search-wrap{margin-left:auto;position:relative;}
+.search-wrap input{background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;padding:6px 12px 6px 28px;font-size:12px;color:var(--text);font-family:var(--sans);width:190px;outline:none;transition:border-color 0.15s;}
+.search-wrap input:focus{border-color:var(--teal);}
+.search-wrap input::placeholder{color:var(--text-muted);}
+.si{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:12px;pointer-events:none;}
+/* LAYOUT */
+.main{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 156px);}
+.feed{border-right:1px solid var(--border);padding:16px 20px;overflow-y:auto;height:calc(100vh - 156px);position:sticky;top:156px;}
+.detail-panel{overflow-y:auto;height:calc(100vh - 156px);position:sticky;top:156px;}
+/* FEED */
+.feed-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.feed-title{font-size:11px;font-family:var(--mono);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;}
+.feed-count{font-size:11px;font-family:var(--mono);color:var(--teal);}
+/* COMPANY CARD */
+.company-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden;}
+.company-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:background 0.15s;}
+.company-card:hover{background:var(--card-hover);border-color:var(--border-strong);}
+.company-card:hover::before,.company-card.active::before{background:var(--teal);}
+.company-card.active{background:var(--card-hover);border-color:rgba(0,201,167,0.3);}
+.company-card.prev-week{border-color:rgba(167,139,250,0.15);}
+.company-card.prev-week::before{background:var(--purple);}
+.cr1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;}
+.cname{font-size:14px;font-weight:600;color:var(--text);}
+.csector{font-size:11px;color:var(--text-muted);}
+.tags{display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0;}
+.tag{font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:4px;font-weight:500;white-space:nowrap;}
+.tag.funded{background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal-glow);}
+.tag.hiring{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,166,35,0.25);}
+.tag.news{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(167,139,250,0.25);}
+.cmeta{display:flex;gap:10px;margin-bottom:6px;}
+.mchip{font-size:10px;font-family:var(--mono);color:var(--text-muted);}
+.mchip .v{color:var(--teal);}
+.csnip{font-size:12px;color:var(--text-secondary);line-height:1.5;}
+.chint{font-size:10px;font-family:var(--mono);color:var(--teal);margin-top:6px;opacity:0.7;}
+/* STATUS BADGES */
+.status-row{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.status-btn{font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:4px;border:1px solid;cursor:pointer;transition:all 0.15s;background:transparent;}
+.status-btn.interested{border-color:rgba(96,165,250,0.4);color:var(--blue);}
+.status-btn.contacted{border-color:rgba(245,166,35,0.4);color:var(--amber);}
+.status-btn.in-conversation{border-color:rgba(74,222,128,0.4);color:var(--green);}
+.status-btn.passed{border-color:rgba(255,107,107,0.4);color:var(--coral);}
+.status-btn.active-status{font-weight:600;}
+.status-btn.interested.active-status{background:var(--blue-dim);}
+.status-btn.contacted.active-status{background:var(--amber-dim);}
+.status-btn.in-conversation.active-status{background:var(--green-dim);}
+.status-btn.passed.active-status{background:var(--coral-dim);}
+.week-badge{font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:4px;margin-left:auto;}
+.week-badge.current{background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal-glow);}
+.week-badge.previous{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(167,139,250,0.25);}
+/* ARCHIVE */
+.archive-section{padding:16px 20px;}
+.archive-header{font-size:11px;font-family:var(--mono);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.archive-header::after{content:'';flex:1;height:1px;background:var(--border);}
+.archive-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:12px;cursor:pointer;opacity:0.7;transition:opacity 0.15s;}
+.archive-card:hover{opacity:1;}
+.archive-name{font-size:13px;font-weight:500;color:var(--text);flex:1;}
+.archive-meta{font-size:10px;font-family:var(--mono);color:var(--text-muted);}
+/* DETAIL PANEL */
+.panel-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);text-align:center;gap:10px;padding:40px;}
+.panel-empty-icon{font-size:28px;opacity:0.2;}
+.panel-empty p{font-size:13px;line-height:1.5;max-width:220px;}
+.detail-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10;overflow-x:auto;}
+.detail-tab{flex-shrink:0;padding:11px 10px;font-size:11px;font-family:var(--mono);color:var(--text-muted);cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:all 0.15s;}
+.detail-tab:hover{color:var(--text-secondary);}
+.detail-tab.active{color:var(--teal);border-bottom-color:var(--teal);}
+.detail-body{padding:20px 24px;}
+/* DETAIL CONTENT */
+.dcname{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--text);margin-bottom:3px;}
+.dcname em{font-style:italic;color:var(--teal);}
+.dctag{font-size:13px;color:var(--text-secondary);margin-bottom:12px;line-height:1.5;}
+.dtags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.sec{margin-bottom:20px;}
+.sl{font-size:10px;font-family:var(--mono);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.sl::after{content:'';flex:1;height:1px;background:var(--border);}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.slabel{font-size:10px;font-family:var(--mono);color:var(--text-muted);margin-bottom:3px;}
+.sval{font-size:15px;font-weight:500;font-family:var(--mono);color:var(--teal);}
+.sval.w{color:var(--text);font-size:13px;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{background:var(--surface);border:1px solid var(--border-strong);border-radius:6px;padding:3px 10px;font-size:11px;color:var(--text-secondary);}
+.ni{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.ni:last-child{border-bottom:none;}
+.ndot{width:6px;height:6px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-top:5px;}
+.ntext{font-size:12px;color:var(--text-secondary);line-height:1.5;}
+.ndate{font-size:10px;font-family:var(--mono);color:var(--text-muted);margin-top:2px;}
+.hb{border-radius:0 8px 8px 0;padding:12px 14px;font-size:12px;line-height:1.7;margin-bottom:10px;}
+.ht{background:var(--teal-dim);border:1px solid var(--teal-glow);color:var(--text);border-left:3px solid var(--teal);}
+.ha{background:var(--amber-dim);border:1px solid rgba(245,166,35,0.25);color:var(--text);border-left:3px solid var(--amber);}
+.hbl{background:var(--blue-dim);border:1px solid rgba(96,165,250,0.25);color:var(--text);border-left:3px solid var(--blue);}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.fc{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.ftitle{font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;}
+.fbody{font-size:11px;color:var(--text-secondary);line-height:1.5;}
+.gs{display:flex;gap:12px;margin-bottom:14px;}
+.gnum{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--amber-dim);border:1px solid rgba(245,166,35,0.3);color:var(--amber);font-size:11px;font-family:var(--mono);display:flex;align-items:center;justify-content:center;font-weight:500;}
+.gtitle{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.gbody{font-size:12px;color:var(--text-secondary);line-height:1.5;}
+.gtag{font-size:10px;font-family:var(--mono);color:var(--text-muted);margin-top:3px;}
+.as{display:flex;gap:12px;margin-bottom:14px;}
+.ae{font-size:14px;flex-shrink:0;width:22px;margin-top:1px;}
+.atitle{font-size:12px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.abody{font-size:12px;color:var(--text-secondary);line-height:1.6;}
+.qi{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;}
+.qcat{font-size:10px;font-family:var(--mono);color:var(--text-muted);margin-bottom:4px;}
+.qtext{font-size:12px;color:var(--text);line-height:1.5;}
+.qhint{font-size:11px;color:var(--text-secondary);margin-top:5px;line-height:1.4;}
+.pc{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.pc:last-child{border-bottom:none;}
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+.av.pm{background:var(--teal-dim);color:var(--teal);}
+.av.cn{background:var(--blue-dim);color:var(--blue);}
+.pi{flex:1;min-width:0;}
+.pname{font-size:13px;font-weight:500;color:var(--text);}
+.prole{font-size:11px;color:var(--text-secondary);}
+.pnote{font-size:10px;color:var(--text-muted);margin-top:1px;}
+.pb{font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:4px;flex-shrink:0;}
+.pb.pm{background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal-glow);}
+.pb.cn{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(96,165,250,0.25);}
+/* ACTION BAR */
+.action-bar{display:flex;gap:8px;flex-wrap:wrap;padding:12px 24px;border-top:1px solid var(--border);background:var(--surface);position:sticky;bottom:0;}
+.ab{flex:1;min-width:100px;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;text-align:center;border:1px solid;font-family:var(--sans);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:5px;}
+.ab.pr{background:var(--teal);color:#0B0F1A;border-color:var(--teal);}
+.ab.pr:hover{opacity:0.85;}
+.ab.se{background:transparent;color:var(--teal);border-color:var(--teal-glow);}
+.ab.se:hover{background:var(--teal-dim);}
+.ab.gh{background:transparent;color:var(--text-secondary);border-color:var(--border-strong);}
+.ab.gh:hover{color:var(--text);}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:4px;}
+@media(max-width:860px){.main{grid-template-columns:1fr;}.feed{height:auto;position:static;}.detail-panel{height:auto;position:static;border-top:1px solid var(--border);display:none;}.detail-panel.open{display:block;}.feature-grid{grid-template-columns:1fr;}}
+@media(prefers-reduced-motion:reduce){.ticker-inner,.live-dot{animation:none;}}
+</style>
+</head>
+<body>
+
+<div class="ticker-bar" aria-hidden="true"><div class="ticker-inner" id="ticker"></div></div>
+
+<header class="header">
+  <div><h1>PM <em>Radar</em></h1><p style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Your BD-to-PM pipeline — funded, hiring &amp; newsworthy companies.</p></div>
+  <div class="header-right">
+    <span class="live-pill" id="weekPill"><span class="live-dot"></span><span id="weekLabel">Loading...</span></span>
+    <span style="font-size:11px;font-family:var(--mono);color:var(--text-muted);">Refreshes every Tuesday</span>
+  </div>
+</header>
+
+<div class="new-banner" id="newBanner">&#9733; New companies added this week — scroll down to see them</div>
+
+<div class="week-nav">
+  <div class="week-tab active" id="tab-current" onclick="switchWeek('current')">This week <span class="wcount" id="count-current">8</span></div>
+  <div class="week-tab" id="tab-previous" onclick="switchWeek('previous')">Last week <span class="wcount" id="count-previous">8</span></div>
+  <div class="week-tab" id="tab-archive" onclick="switchWeek('archive')">Archive <span class="acount" id="count-archive">0</span></div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;padding:0 8px;">
+    <span style="font-size:10px;font-family:var(--mono);color:var(--text-muted);">status filter:</span>
+    <select id="statusFilter" onchange="renderFeed()" style="background:var(--surface);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--text-secondary);font-family:var(--mono);outline:none;">
+      <option value="all">all</option>
+      <option value="none">not started</option>
+      <option value="interested">interested</option>
+      <option value="contacted">contacted</option>
+      <option value="in-conversation">in conversation</option>
+      <option value="passed">passed</option>
+    </select>
+  </div>
+</div>
+
+<div class="filters">
+  <span class="filter-label">type //</span>
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="funded">Funded</button>
+  <button class="filter-btn" data-filter="hiring">Hiring PMs</button>
+  <button class="filter-btn" data-filter="news">In the news</button>
+  <div class="search-wrap"><span class="si">&#8981;</span><input type="text" id="search" placeholder="Search companies…"/></div>
+</div>
+
+<div class="main">
+  <div class="feed">
+    <div class="feed-header"><span class="feed-title" id="feedTitle">This week</span><span class="feed-count" id="fc">8 companies</span></div>
+    <div id="feed"></div>
+  </div>
+  <div class="detail-panel" id="dp">
+    <div class="panel-empty" id="pe"><div class="panel-empty-icon">&#9678;</div><p>Click any company to see the full dossier across 7 tabs.</p></div>
+    <div id="di" style="display:none;">
+      <div class="detail-tabs" id="dt"></div>
+      <div class="detail-body" id="db"></div>
+      <div class="action-bar" id="ab"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── WEEK MANAGEMENT ────────────────────────────────────────────────────────
+function getWeekKey(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(d.setDate(diff));
+  return monday.toISOString().slice(0,10);
+}
+
+function getTuesdayOfWeek(weekKey) {
+  const d = new Date(weekKey);
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().slice(0,10);
+}
+
+function formatWeekLabel(weekKey) {
+  const mon = new Date(weekKey);
+  const sun = new Date(weekKey);
+  sun.setDate(sun.getDate() + 6);
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return months[mon.getMonth()] + " " + mon.getDate() + "–" + sun.getDate() + ", " + sun.getFullYear();
+}
+
+const TODAY = new Date();
+const CURRENT_WEEK = getWeekKey(TODAY);
+const PREV_DATE = new Date(TODAY); PREV_DATE.setDate(PREV_DATE.getDate() - 7);
+const PREV_WEEK = getWeekKey(PREV_DATE);
+
+// weekLabel set in DOMContentLoaded below
+
+// ─── PIPELINE STATE (localStorage) ──────────────────────────────────────────
+function getStatuses() {
+  try { return JSON.parse(localStorage.getItem("pmradar_status") || "{}"); } catch(e) { return {}; }
+}
+function setStatus(id, week, status) {
+  const s = getStatuses();
+  const key = week + "_" + id;
+  if (s[key] === status) { delete s[key]; }
+  else { s[key] = status; }
+  localStorage.setItem("pmradar_status", JSON.stringify(s));
+  renderFeed();
+  if (aid === id) { const c = getCompany(id); if(c) renderTabs(c); }
+}
+function getStatus(id, week) {
+  return getStatuses()[week + "_" + id] || null;
+}
+
+// ─── WEEK ASSIGNMENT ─────────────────────────────────────────────────────────
+// Current week companies (ids 1-8) and previous week (ids 101-108, cloned with prev week flag)
+// We tag each company with its week
+function taggedCompanies() {
+  const curr = D.map(c => ({...c, _week: CURRENT_WEEK, _uid: CURRENT_WEEK + "_" + c.id}));
+  const prev = D.map((c,i) => ({
+    ...c,
+    id: 100 + c.id,
+    name: c.name,
+    _week: PREV_WEEK,
+    _uid: PREV_WEEK + "_" + c.id,
+    _origId: c.id,
+    date: "Jun 9–13"
+  }));
+  return {curr, prev};
+}
+
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const D=[
+{id:1,name:"Odyssey",tagline:"AI lab building world models for physical intelligence",tags:["funded","news"],sector:"AI / Physical AI",stage:"Series B",amount:"$310M",valuation:"$1.45B",date:"Jun 17",
+investors:["Natural Capital","Amazon","GV","AMD Ventures","IQT","EQT","Jeff Dean","Kyle Vogt","Garry Tan"],
+snippet:"Week's biggest round. Building world models — AI that simulates physical reality for robotics, autonomous systems, and gaming.",
+parent_sub:"Independent AI lab founded 2023, Palo Alto. No parent company. Strategic partner: AWS (preferred cloud provider). Angel backers include Jeff Dean (Google Chief Scientist), Kyle Vogt (Cruise founder), and Garry Tan (YC CEO) — signals deep roots in AV, Silicon Valley AI leadership, and startup ecosystem.",
+what_building:[
+  {t:"World models (core)",b:"AI that simulates how objects, people, and environments interact over time — going beyond language/image generation to model physical reality with accurate physics."},
+  {t:"Odyssey-2 Pro",b:"Flagship multimodal world model. Real-time physics simulation, multi-agent environments, active exploration. A foundation model for the physical world."},
+  {t:"Proprietary data capture",b:"Operators carry custom 25lb rigs (6 cameras + lidar) capturing real environments at 3.5K/360° with physics-accurate depth metadata. Their Google Street View equivalent — this is the data moat."},
+  {t:"Target verticals",b:"Robotics, autonomous systems, gaming simulation, healthcare, and defense/intelligence (IQT backing signals government interest alongside commercial)."}
+],
+gtm:[
+  {n:1,t:"AWS as distribution channel",b:"The preferred cloud deal isn't just compute — AWS brings robotics and industrial IoT enterprise customers to Odyssey's door via AWS Marketplace and co-sell motions.",tg:"Channel: cloud marketplace + AWS enterprise sales"},
+  {n:2,t:"Research credibility → enterprise demand",b:"Jeff Dean, Garry Tan, Kyle Vogt backing generates inbound from top AI and robotics teams. Publish research → attract talent → build pipeline. Reputation-led GTM.",tg:"Motion: thought leadership → warm inbound"},
+  {n:3,t:"Custom enterprise pilots",b:"Revenue from API access + simulation-as-a-service contracts with robotics and gaming companies. Not self-serve yet — high-touch enterprise sales with long cycles.",tg:"Model: pilot → expand → multi-year contract"},
+  {n:4,t:"Defense/intelligence parallel track",b:"IQT (CIA's venture arm) participation unlocks a government track with longer sales cycles but higher ACVs and guaranteed budget.",tg:"Track: commercial + government dual-channel"}
+],
+why:"Just raised $310M with zero public PM structure. The product-to-customer translation layer needs building from scratch. A BD-background PM who can find the first repeatable enterprise workflow has a massive opening.",
+news:[
+  {t:"Closes $310M Series B at $1.45B valuation, led by Natural Capital with Amazon joining as strategic cloud partner",d:"Jun 17, 2026"},
+  {t:"Announces AWS preferred cloud deal — Trainium chips for world model training at scale",d:"Jun 17, 2026"},
+  {t:"CEO Oliver Cameron: 'World models are the next class of foundation model — AI that understands the world itself'",d:"Jun 17, 2026"}
+],
+angle:[
+  {e:"🎯",t:"Your BD angle",b:"You've closed deals and understand what makes enterprise buyers say yes. Frame yourself as 'the PM who finds the first repeatable customer workflow' — not just discovery, but with the commercial instinct to know which use cases actually close."},
+  {e:"📬",t:"Outreach",b:"Reach Oliver Cameron on X (he's active). Reply to one of his posts with a 3-sentence question about enterprise GTM — don't pitch a job, pitch a problem observation."},
+  {e:"💡",t:"What to pitch",b:"Propose owning the enterprise pilot program — design the discovery process, run customer interviews with robotics and gaming partners, create a repeatable sales motion around simulation-as-a-service."},
+  {e:"⚡",t:"48hr move",b:"Write a LinkedIn post: 'What does the first enterprise sale look like for a world model company?' Tag Oliver Cameron. Gets attention without asking for anything."}
+],
+questions:[
+  {c:"Product sense",q:"How would you decide which vertical — robotics, gaming, or defense — Odyssey should prioritize first, and how would you validate that decision?",h:"They're research-first with no GTM yet. Show you can prioritize by commercial signal, not technical elegance."},
+  {c:"BD → PM translation",q:"Walk me through how you'd run a discovery sprint with an enterprise customer who doesn't yet know they need world models.",h:"They'll probe your PM credibility. Show user research rigor, not just deal-closing instinct."},
+  {c:"Metrics",q:"What does 'success' look like for an enterprise simulation-as-a-service pilot after 90 days?",h:"Time-to-first-simulation, number of iterations run, qualitative fidelity vs. speed feedback."},
+  {c:"Strategic",q:"Odyssey has $310M and a world-class model. What's the biggest risk in their product strategy over the next 18 months?",h:"Customer concentration, enterprise sales cycle length, model commoditization — show you think beyond the raise."}
+],
+pms:[{n:"Oliver Cameron",r:"Co-Founder & CEO",t:"pm",nt:"Ex-VP Product, Cruise. Very active on X."},{n:"Jeff Hawke",r:"Co-Founder & CTO",t:"pm",nt:"Ex-founding engineer, Wayve (built GAIA model)."}],
+connections:[{n:"Cruise PM alumni",r:"Oliver Cameron's former team",t:"cn",nt:"Search: Cruise + Product Manager → 2nd degree filter"},{n:"AWS Robotics PMs",r:"Strategic partner — skin in the game",t:"cn",nt:"AWS Robotics team has shared goals with Odyssey"}],
+careers:"odyssey.ml/careers"},
+
+{id:2,name:"Behavox",tagline:"AI compliance platform for 60+ of the world's largest financial institutions",tags:["funded","hiring"],sector:"FinTech / RegTech",stage:"Growth",amount:"$175M",valuation:"Undisclosed",date:"Jun 17",
+investors:["Undisclosed lead"],
+snippet:"UK-based compliance AI monitors employee comms and trading behavior. Expanding US enterprise sales aggressively and hiring PMs.",
+parent_sub:"Independent, HQ'd in London with a New York office. No parent company. Key customer relationships: bulge-bracket banks (HSBC, Goldman Sachs tier). Erkin Adylov (founder/CEO) is primary shareholder and drives product strategy personally. Post-raise expansion into crypto exchanges and fintech platforms.",
+what_building:[
+  {t:"Communication surveillance",b:"AI monitoring Slack, email, voice calls, and trading comms across financial institutions for compliance violations, insider trading, and conduct risk."},
+  {t:"Behavox Quantum AI",b:"LLM-native compliance engine that understands context and intent in financial communications — beyond keyword matching to detect behavioral patterns."},
+  {t:"Trade surveillance",b:"Monitors trading activity in real-time against communication patterns to detect market manipulation, front-running, and spoofing."},
+  {t:"Crypto/fintech expansion",b:"Post-raise: extending surveillance to crypto exchanges and fintech platforms — reusing the same AI in adjacent regulated markets."}
+],
+gtm:[
+  {n:1,t:"Enterprise direct sales to CCOs/CROs",b:"Sell to Chief Compliance Officers and Chief Risk Officers at large financial institutions. Long 9–18 month sales cycles but multi-million ACV contracts.",tg:"Buyer: CCO/CRO → IT → Legal sign-off chain"},
+  {n:2,t:"Regulator-first positioning",b:"Position product as the answer to FINRA, FCA, and MAS regulatory mandates. Compliance teams buy when regulators demand it — Behavox works to get included in regulatory guidance first.",tg:"Motion: regulatory pull-through demand"},
+  {n:3,t:"New market expansion",b:"Using $175M raise to enter crypto exchanges and fintech platforms — same surveillance AI, new regulated market with faster procurement cycles.",tg:"Expansion: banking → crypto → fintech"},
+  {n:4,t:"SI partnerships",b:"Accenture, Deloitte, and KPMG compliance practices recommend Behavox to clients as part of RegTech transformation projects.",tg:"Channel: systems integrator referral network"}
+],
+why:"In scale mode post-raise. Needs a PM to own onboarding, reduce time-to-value, and build product motion for new markets (crypto/fintech). Your BD background translates directly — you understand how compliance buyers make decisions and what makes them say yes.",
+news:[
+  {t:"Raises $175M growth round — accelerating US enterprise expansion and new AI compliance modules",d:"Jun 17, 2026"},
+  {t:"Now monitors 60+ of the world's largest financial institutions including bulge-bracket banks",d:"Jun 2026"},
+  {t:"3 open PM roles posted in the last 30 days across London and New York offices",d:"Jun 2026"}
+],
+angle:[
+  {e:"🎯",t:"Your BD angle",b:"You know what compliance buyers care about: regulatory defensibility and audit trails. Pitch yourself as the PM who can design the sales-assist features — ROI calculators, compliance audit exports, and evidence packs that help CCOs justify the purchase internally."},
+  {e:"📬",t:"Outreach",b:"LinkedIn outreach to their Head of Product or CPO. Attach a 1-page teardown showing where you think their time-to-first-alert is longest and how you'd fix it."},
+  {e:"💡",t:"What to pitch",b:"Own the enterprise onboarding sprint — take time-to-first-alert from 6 months to 6 weeks. Frame as a discovery project: interview 5 clients in the first 30 days, map activation drop-offs, ship 3 quick wins."},
+  {e:"⚡",t:"48hr move",b:"Apply directly on behavox.com/careers — 3 PM roles posted this week. In your cover note, name the specific onboarding problem and your approach."}
+],
+questions:[
+  {c:"Domain",q:"How would you run discovery with a compliance officer to find where Behavox loses customers in the first 90 days?",h:"Show you understand the CCO's world — risk-averse, time-poor, answerable to regulators. Research design must respect that."},
+  {c:"GTM fluency",q:"How would you help Behavox enter the crypto exchange market using its existing surveillance tech?",h:"Your BD background shines here. Think buyer differences, regulatory landscape (CFTC, SEC), and what to reuse vs. rebuild."},
+  {c:"Metrics",q:"What KPIs would you set for a new enterprise onboarding experience and what's your 90-day target for each?",h:"Time-to-first-alert, % data sources connected in week 1, NPS at day 30, support ticket volume in month 1."},
+  {c:"Stakeholder",q:"Compliance products need Legal, IT, and business sign-off. How do you build a product that helps all three say yes faster?",h:"Classic enterprise PM challenge. Show you can build for multiple stakeholders within one product surface."}
+],
+pms:[{n:"Erkin Adylov",r:"Founder & CEO",t:"pm",nt:"Active on LinkedIn post-raise. Open to product conversations."},{n:"Head of Product",r:"Search: Behavox + product + London/NYC",t:"pm",nt:"Not publicly named — find via LinkedIn search."}],
+connections:[{n:"RegTech PM community",r:"Compliance tech is a tight-knit PM world",t:"cn",nt:"Search: RegTech + Product Manager + London or NYC"},{n:"Bank compliance alumni",r:"HSBC / Goldman alumni who use Behavox",t:"cn",nt:"Warm intros from bank-side contacts"}],
+careers:"behavox.com/careers"},
+
+{id:3,name:"Forage",tagline:"Financial infrastructure for SNAP, WIC, and government benefits payments",tags:["funded","hiring"],sector:"FinTech / Social Impact",stage:"Series B",amount:"$40M",valuation:"Undisclosed",date:"Jun 3",
+investors:["Mouro Capital","Nyca Partners","PayPal Ventures","Intuit Ventures","Pivotal Ventures","Long Journey Ventures"],
+snippet:"Helping 100k+ retailers accept SNAP/WIC/HSA payments. Series B to expand benefit types and launch a new consumer grocery savings app.",
+parent_sub:"Independent company. No parent. Key embedded distribution: Dollar General, DoorDash, Uber Eats, Gopuff — Forage's payment rails run inside their checkout flows. Pivotal Ventures (Melinda Gates) signals social impact credibility. Intuit Ventures provides fintech distribution access and warm enterprise intro network.",
+what_building:[
+  {t:"Benefits acceptance API",b:"API and SDK letting retailers and delivery platforms accept SNAP, WIC, HSA, and FSA benefits at checkout — replacing fragmented, legacy government payment rails."},
+  {t:"Retailer dashboard",b:"Operations tool for store managers to track benefits transaction volume, reconciliation, and compliance reporting across 100,000+ locations."},
+  {t:"Consumer app (new, Series B funded)",b:"Consumer-facing app for benefits recipients to check balances, find eligible products, and access grocery savings — an entirely new product surface."},
+  {t:"Benefits data layer",b:"Anonymized data on benefits spending patterns across retailers. Valuable for policy research, retailer merchandising, and government program reporting."}
+],
+gtm:[
+  {n:1,t:"Platform partnership anchor deals",b:"Sign DoorDash, Uber Eats, Dollar General — once Forage is embedded in their checkout, every one of their locations becomes a customer automatically. B2B2C distribution at massive scale.",tg:"Motion: anchor deal → automatic multi-location distribution"},
+  {n:2,t:"Government mandate tailwind",b:"Federal and state mandates increasingly require EBT acceptance online and at delivery platforms. Forage positions as the compliant, ready-to-deploy solution when a mandate drops.",tg:"Trigger: regulatory mandate → inbound demand surge"},
+  {n:3,t:"Direct retailer sales",b:"Outreach to regional grocery chains and convenience store operators who want to accept benefits but lack the technical capability. Classic B2B SaaS with a social impact wrapper.",tg:"Channel: direct enterprise retail sales motion"},
+  {n:4,t:"Consumer app for end-user relationship",b:"Post-Series B: own the relationship with benefits recipients directly. App increases basket size and loyalty for retailer partners — creates a flywheel.",tg:"New: B2C layer on top of B2B infrastructure"}
+],
+why:"Rare triple win: mission-driven, commercially strong, and growing fast. Consumer app launch = 0→1 PM surface. Your BD background maps to the partnership motion — you understand how to structure platform deals that create distribution at scale.",
+news:[
+  {t:"Raises $40M Series B — expanding to new benefit types and launching consumer app for balance checks and grocery savings",d:"Jun 3, 2026"},
+  {t:"Now live at 100,000+ stores in all 50 US states — Dollar General, Gopuff, DoorDash, Uber Eats",d:"Jun 2026"},
+  {t:"Pivotal Ventures (Melinda Gates) joins cap table — signals social impact alignment",d:"Jun 2026"}
+],
+angle:[
+  {e:"🎯",t:"Your BD angle",b:"Forage's growth is driven by platform deals with DoorDash, Uber Eats, and Dollar General. Your BD instinct lets you think about features that make Forage easier to integrate and harder to replace — stickiness as product strategy."},
+  {e:"📬",t:"Outreach",b:"Reach their Head of Product or CEO on LinkedIn. Lead with both mission AND commercial: 'I've been thinking about how the new consumer app becomes a retention moat for retailer partners — happy to share my thinking.'"},
+  {e:"💡",t:"What to pitch",b:"Own the new consumer app — run discovery sprints with SNAP recipients, map their jobs-to-be-done, and define the first 3 features that drive weekly active use. Classic 0→1 PM opportunity."},
+  {e:"⚡",t:"48hr move",b:"Search PayPal Ventures and Intuit Ventures portfolio PM alumni on LinkedIn — both are investors with warm intro potential to Forage's hiring team."}
+],
+questions:[
+  {c:"User empathy",q:"SNAP recipients are a user group most PMs have never designed for. How would you run research with them in a way that's respectful, accurate, and actionable?",h:"Show cultural humility and research rigor. Best answers involve community partnerships, not just individual user interviews."},
+  {c:"Platform PM",q:"Forage lives inside DoorDash and Uber Eats checkout. What does it mean to be a PM when your product is embedded in someone else's product?",h:"Constraint-based PM thinking. What can you control? What's your leverage? How do you influence without authority?"},
+  {c:"BD → PM",q:"How would you prioritize which new benefit type — FSA, childcare subsidies, housing vouchers — Forage should add next?",h:"Your BD instinct helps: TAM, regulatory readiness, and which retailers are already requesting it."},
+  {c:"Consumer",q:"The new app targets low-income households. How do you design for users with limited data plans, older phones, and low app literacy?",h:"Equity-by-design: lightweight app, SMS fallback, offline mode, local language support."}
+],
+pms:[{n:"Roxy Young",r:"CEO & Co-Founder",t:"pm",nt:"Searchable on LinkedIn. Mission-driven founder."},{n:"Head of Product",r:"Search: Forage fintech + product on LinkedIn",t:"pm",nt:"Small team — likely direct access to founders."}],
+connections:[{n:"PayPal alumni network",r:"PayPal Ventures is an investor",t:"cn",nt:"PayPal → Forage alumni connection paths likely"},{n:"Intuit PM community",r:"Intuit Ventures is an investor",t:"cn",nt:"Strong fintech PM community via Intuit alumni"}],
+careers:"joinforage.com/careers"},
+
+{id:4,name:"PointFive",tagline:"AI cost visibility and control for cloud and AI infrastructure spend",tags:["funded","hiring"],sector:"AI Ops / FinOps",stage:"Series B",amount:"$60M",valuation:"Undisclosed",date:"Jun 9",
+investors:["Accel"],
+snippet:"NY-based FinOps for AI spend. Accel-led Series B. Every enterprise is spending millions on AI compute with no visibility. PointFive is the CFO's answer. 2 PM roles open.",
+parent_sub:"Independent company, headquartered in New York. No parent. Backed by Accel, which also backs Datadog, HashiCorp and other infra companies — strong warm intro network across cloud infra ecosystem. Competes with Apptio (IBM subsidiary), CloudHealth (VMware/Broadcom), and Harness Cloud Cost Management.",
+what_building:[
+  {t:"Cloud cost intelligence",b:"Real-time visibility into AWS, GCP, and Azure spend across teams, products, and services. Identifies waste, rightsizing opportunities, and anomalous spend spikes."},
+  {t:"AI inference cost monitoring",b:"New: tracks cost of running AI workloads in production — per model, per team, per API call. As LLM usage scales, this is the fastest-growing product line."},
+  {t:"Recommendation engine",b:"Proactive suggestions: 'This team is overspending on GPU instances by 40% — here is the rightsizing recommendation.' Actionable, not just informational."},
+  {t:"FinOps workflows",b:"Approval flows, budget alerts, and showback/chargeback reports that CFOs and engineering managers can both use without a data analyst in the middle."}
+],
+gtm:[
+  {n:1,t:"CFO + CTO dual-buyer motion",b:"Sell to CFOs shocked by AI bills AND CTOs who want to ship without budget constraints. Both want PointFive for different reasons — product has to serve both simultaneously.",tg:"Dual buyer: CFO (cost) + CTO (control)"},
+  {n:2,t:"Cloud marketplace distribution",b:"Listed on AWS, GCP, and Azure marketplaces. Enterprises draw down committed cloud spend to pay for PointFive — no separate procurement process needed.",tg:"Channel: committed cloud spend drawdown"},
+  {n:3,t:"Usage-based pricing model",b:"Charge as a % of cloud spend managed — aligns PointFive revenue with customer success. As customer cloud spend grows, PointFive ACV grows automatically.",tg:"Pricing: % of managed spend = aligned incentives"},
+  {n:4,t:"Accel portfolio warm intros",b:"Accel portfolio companies are natural first customers. Strong network-based GTM for early enterprise deals without a large outbound sales team.",tg:"Early GTM: investor portfolio distribution"}
+],
+why:"Every company is drowning in AI compute bills with no visibility into who's spending what on which model. PointFive is the urgent answer. 2 PM roles open post-raise — your BD background is perfect for a dual-buyer product (CFO + CTO). You've navigated complex enterprise stakeholders before.",
+news:[
+  {t:"Raises $60M Series B led by Accel — enterprise demand for AI cost control surging as compute bills balloon in 2026",d:"Jun 9, 2026"},
+  {t:"Expanding product to cover real-time AI inference cost monitoring alongside core cloud FinOps",d:"Jun 2026"},
+  {t:"2 open PM roles posted this week — actively hiring in New York post-close",d:"Jun 2026"}
+],
+angle:[
+  {e:"🎯",t:"Your BD angle",b:"PointFive has a classic dual-buyer enterprise problem — CFOs and CTOs have different motivations and both need to say yes. Your BD instinct lets you design the product so that the CFO demo and the CTO demo both lead to the same close. That's a rare PM skill."},
+  {e:"📬",t:"Outreach",b:"Apply directly — actively hiring. Cover note: 'I have sold to both CFOs and technical buyers in B2B SaaS. Here is how I would approach the dual-buyer design problem in your product.'"},
+  {e:"💡",t:"What to pitch",b:"Own the recommendation engine — when should PointFive alert a team about overspending, how should it frame that for an engineer vs. a CFO, and what is the in-product approval workflow?"},
+  {e:"⚡",t:"48hr move",b:"Apply now — growth mode this week post-close. Two open PM roles. The earlier you are in the pipeline the better."}
+],
+questions:[
+  {c:"Dual-buyer design",q:"PointFive serves both CFOs and engineering managers. How do you design one product that makes both stakeholders feel it was built for them?",h:"Your BD background is the answer. Show you have navigated multi-stakeholder enterprise deals and can translate that into product design."},
+  {c:"AI domain",q:"How would you decide what AI spend anomalies to surface proactively vs. let the user discover themselves?",h:"Too many alerts = alert fatigue. Too few = missed savings. Show you can find the right threshold through research."},
+  {c:"Pricing",q:"PointFive charges as a % of cloud spend managed. What are the risks of this model and how would you evolve pricing as the product matures?",h:"BD instinct: customer incentives to reduce spend, churn risk, competitive pricing pressure as category matures."},
+  {c:"Market",q:"AI compute costs are falling as GPU supply increases. How does that affect PointFive's value proposition and what is your product response?",h:"Show you can think about secular market trends and evolve product positioning accordingly."}
+],
+pms:[{n:"Founders (LinkedIn search)",r:"Search: PointFive New York + founder",t:"pm",nt:"Small team — founders own product."},{n:"Open PM role x2",r:"Actively hiring this week",t:"pm",nt:"Apply directly — two roles on their site."}],
+connections:[{n:"Accel portfolio alumni",r:"Accel backs Datadog, HashiCorp and more",t:"cn",nt:"Search Accel portfolio → PointFive warm intro paths"},{n:"NY cloud / FinOps PM community",r:"NYC cloud infra PM network",t:"cn",nt:"Search: cloud cost + product manager + New York"}],
+careers:"pointfive.ai/careers"},
+
+{id:5,name:"Coralogix",tagline:"AI-powered observability platform for enterprise engineering teams",tags:["funded","hiring"],sector:"Enterprise Infra / AI Ops",stage:"Series F",amount:"$200M",valuation:"$1.6B",date:"Jun 3",
+investors:["Advent International","CPP Investments","Greenfield Partners","Brighton Park Capital"],
+snippet:"Observability platform at $1.6B. Series F means scaling enterprise sales hard. Actively hiring PMs to own logging, monitoring, and AI ops product lines.",
+parent_sub:"Independent, dual-HQ in Boston and Tel Aviv. No parent. Deep integration partnerships with AWS, GCP, and Azure — observability data flows from all cloud providers into Coralogix. Direct competitor to Datadog ($50B+ market cap), Splunk (now Cisco), and New Relic. Brighton Park Capital brings enterprise SaaS scaling expertise.",
+what_building:[
+  {t:"AI-native log management",b:"Ingest and analyze logs, metrics, and traces at petabyte scale with AI anomaly detection built in — not bolted on afterward like legacy competitors."},
+  {t:"Loggregation engine",b:"Proprietary pipeline that reduces log volume by up to 80% before storage — dramatically cutting customer costs vs. Datadog. Core commercial differentiator."},
+  {t:"AI Anomaly Detection Suite",b:"New product (May 2026) — proactively surfaces infrastructure issues before they become incidents. Key feature differentiator in enterprise deals."},
+  {t:"Security analytics (SIEM expansion)",b:"Expanding into security event correlation alongside infrastructure observability — one platform for DevOps and SecOps teams."}
+],
+gtm:[
+  {n:1,t:"Cost-savings wedge vs. Datadog",b:"Lead every enterprise conversation with 'cut your observability bill by 60%.' CTOs and VPs Eng feel the Datadog bill monthly. Coralogix enters as the cost-efficient, AI-native alternative.",tg:"Positioning: Datadog alternative at half the price + AI"},
+  {n:2,t:"Developer-led PLG → enterprise expand",b:"Free tier for individual developers seeds bottom-up adoption. Engineers adopt, champion to manager, team buys, enterprise contract follows.",tg:"Motion: PLG developer adoption → land and expand"},
+  {n:3,t:"Cloud marketplace listings",b:"Available on AWS, GCP, and Azure marketplaces — enterprises use committed cloud spend to buy Coralogix, reducing procurement friction significantly.",tg:"Channel: cloud marketplace committed spend drawdown"},
+  {n:4,t:"SI partnerships for migration deals",b:"Accenture and Deloitte cloud practices bundle Coralogix into cloud migration and FinOps engagements as the observability layer.",tg:"Channel: SI-led cloud migration projects"}
+],
+why:"Series F = proven product, now scaling distribution hard. Great BD-PM role: you would own the enterprise expansion motion and design product features that help AEs close faster. DevOps buyers are notoriously underserved by most PM teams — your research instincts have real value here.",
+news:[
+  {t:"Raises $200M Series F at $1.6B valuation — expanding AI-native observability across North America and Europe",d:"Jun 3, 2026"},
+  {t:"Launches AI Anomaly Detection Suite — reduces MTTR for enterprise customers by surfacing issues before incidents",d:"May 2026"},
+  {t:"Actively hiring PMs and enterprise AEs across Boston and Tel Aviv offices",d:"Jun 2026"}
+],
+angle:[
+  {e:"🎯",t:"Your BD angle",b:"Observability sales die in the POC stage. Your BD background means you understand how to design a POC that is set up to win — build that into the product. Pitch: 'I design products that help AEs close faster and reduce POC-to-contract time.'"},
+  {e:"📬",t:"Outreach",b:"Reach their VP Product or CPO on LinkedIn. Lead with: 'I have been thinking about the POC-to-close problem in observability — here is a 1-page teardown of what I would fix in your trial experience.' Attach it."},
+  {e:"💡",t:"What to pitch",b:"Own the enterprise time-to-value — from signup to first anomaly alert in under 7 days. Run discovery with SRE teams who churned during POC to find the friction."},
+  {e:"⚡",t:"48hr move",b:"Apply now via coralogix.com/careers — PM roles posted this week. Use the cover note to attach your 1-page observability POC teardown."}
+],
+questions:[
+  {c:"Developer empathy",q:"SRE and DevOps engineers hate products that over-promise during POC. How would you redesign Coralogix's trial to get an engineer to their aha moment in under 2 hours?",h:"Show you understand technical users. Best answers involve removing steps, not adding features."},
+  {c:"Competitive",q:"Datadog has more features and brand recognition. Why should a CTO switch to Coralogix and what is your role as PM in making that switch easier?",h:"Your BD background helps: switching costs, migration tools, what 'easy to leave Datadog' looks like as a product feature."},
+  {c:"Metrics",q:"What metrics would you own as the PM for enterprise onboarding and what does success look like at 30/60/90 days?",h:"Time-to-first-alert, POC completion rate, contract conversion from POC, data sources connected in week 1."},
+  {c:"Strategic",q:"Coralogix is expanding into security analytics. How do you prioritize observability features vs. security features without losing product focus?",h:"Show you can manage scope. Good PMs know what NOT to build as much as what to build."}
+],
+pms:[{n:"Ariel Assaraf",r:"CEO & Co-Founder",t:"pm",nt:"Active on LinkedIn post Series F raise."},{n:"Product team",r:"Search: Coralogix + Product Manager",t:"pm",nt:"Mid-size team, several PMs visible in Boston and Tel Aviv."}],
+connections:[{n:"Datadog alumni PMs",r:"Competitive — many moved to adjacent companies",t:"cn",nt:"Search: Datadog → Coralogix connection paths"},{n:"Boston SaaS PM community",r:"Coralogix is Boston-HQ — strong local network",t:"cn",nt:"Boston PM communities + Advent portfolio network"}],
+careers:"coralogix.com/careers"},
+
+{id:6,name:"PhysicsX",tagline:"AI-accelerated physics simulation cutting engineering design time from days to seconds",tags:["funded","news"],sector:"Deep Tech / Industrial AI",stage:"Series C",amount:"Undisclosed",valuation:"Unicorn",date:"Jun 9",
+investors:["Temasek","M&G","NVIDIA","Siemens","Atomico","Applied Materials","Intrepid Growth Partners","NGP"],
+snippet:"AI that replaces slow physics simulation for engineers. NVIDIA and Siemens backing signals industrial AI is the next wave. Doubled revenue and customer base YoY.",
+parent_sub:"Independent UK company (London HQ, US office). No parent, but Siemens is both investor AND strategic distribution partner — Siemens industrial customers are PhysicsX's primary target market. NVIDIA is both investor and compute provider. Applied Materials = semiconductor manufacturing customers baked into the cap table.",
+what_building:[
+  {t:"Neural physics simulators",b:"AI surrogates replacing traditional finite element analysis (FEA) and computational fluid dynamics (CFD) simulations. Runs in seconds vs. hours or days."},
+  {t:"Design optimization engine",b:"Not just faster simulation — actively suggests design improvements. Engineers input constraints, PhysicsX explores the design space and surfaces optimized configurations automatically."},
+  {t:"Domain-specific foundation models",b:"Specialized models for aerospace, automotive, semiconductor manufacturing, and energy — each vertical has different physics, so PhysicsX builds domain-specific models."},
+  {t:"Simulation API",b:"Developers and engineers access PhysicsX via API — integrates into existing CAD and CAE workflows without replacing tools engineers already know and trust."}
+],
+gtm:[
+  {n:1,t:"Siemens as OEM distribution vehicle",b:"Siemens Digital Industries (NX, Simcenter software) serves 100,000+ engineering teams. PhysicsX integrates as a faster simulation engine inside tools engineers already use daily.",tg:"Channel: OEM integration via Siemens Digital Industries"},
+  {n:2,t:"NVIDIA co-sell + ecosystem",b:"NVIDIA's venture backing brings GPU compute and signals to the industrial AI market that PhysicsX is the preferred AI simulation layer. Joint GTM with NVIDIA Enterprise sales.",tg:"Motion: NVIDIA co-sell + GPU compute partnership"},
+  {n:3,t:"R&D land → production expand",b:"Start with a single engineering team running design sprints (easy to justify ROI). Once proven, expand to the full product development cycle and production validation.",tg:"Motion: R&D pilot → full program expand"},
+  {n:4,t:"Academic publishing for demand gen",b:"Regular papers in top ML and engineering journals build credibility with senior engineering VPs. Research-led demand generation for a technically sophisticated buyer.",tg:"Demand gen: academic publishing → enterprise inbound"}
+],
+why:"Industrial AI is the next wave after LLMs and PhysicsX has the best investor lineup in the space. Needs PMs who can talk to aerospace and automotive engineers AND translate that into a product roadmap. BD background helps — industrial buyers are conservative and relationship-driven, exactly your strength.",
+news:[
+  {t:"Closes Series C backed by Temasek, NVIDIA, and Siemens — more than doubled revenue and customer base in the past year",d:"Jun 9, 2026"},
+  {t:"Technology cuts simulation time from days to seconds, enabling engineers to run thousands of design iterations per cycle",d:"Jun 2026"},
+  {t:"Positioned as one of few industrial AI unicorns — expanding team across UK and US",d:"Jun 2026"}
+],
+angle:[
+  {e:"🎯",t:"Your BD angle",b:"Industrial engineering buyers are conservative and relationship-driven. Your BD background means you know how to build trust over long sales cycles. Pitch: 'I have sold to technical buyers before. I know how to build products that speak their language AND make procurement easy for their teams.'"},
+  {e:"📬",t:"Outreach",b:"Reach Jon Chapman (CEO) via LinkedIn. Angle: 'I have been thinking about the user research gap in engineering simulation tools — expert users are deeply underserved by most product teams. Would love to share some thoughts.'"},
+  {e:"💡",t:"What to pitch",b:"Own the first simulation onboarding journey — define what success looks like when an aerospace engineer runs their first AI simulation, and build the experience that gets them there in under 2 hours."},
+  {e:"⚡",t:"48hr move",b:"Search NVIDIA and Siemens alumni on LinkedIn and find anyone with a connection to PhysicsX — both are investors with active portfolio introduction programs."}
+],
+questions:[
+  {c:"Domain",q:"You would be building for aerospace and automotive engineers. How would you get up to speed fast enough to be a credible PM in the first 60 days?",h:"Show a structured learning plan: user archetypes, immersive research sessions, internal SMEs to shadow, domain reading list."},
+  {c:"BD → PM",q:"PhysicsX's early deals are driven by relationships with Siemens and NVIDIA. How do you make those partnership deals repeatable rather than dependent on individual champions?",h:"Think about what easy-to-integrate means for an OEM partner: APIs, documentation, white-labeling, joint customer success."},
+  {c:"Product strategy",q:"PhysicsX has models for aerospace, automotive, and semiconductors. How do you decide which vertical gets the next investment?",h:"Score by revenue potential, customer concentration risk, and technical differentiation in each vertical."},
+  {c:"Metrics",q:"How would you measure whether a new engineering customer is getting value in their first 90 days?",h:"Simulations run, time saved vs. baseline, design iterations per week, NPS from lead engineers on the account."}
+],
+pms:[{n:"Jon Chapman",r:"CEO & Co-Founder",t:"pm",nt:"Ex-Rolls Royce. Active on LinkedIn post Series C."},{n:"Product team",r:"Search: PhysicsX + product on LinkedIn",t:"pm",nt:"Growing fast — likely hiring PMs now."}],
+connections:[{n:"NVIDIA alumni PMs",r:"NVIDIA is an investor",t:"cn",nt:"NVentures portfolio → PhysicsX warm intro path"},{n:"Siemens Digital Industries",r:"Investor and distribution partner",t:"cn",nt:"Search Siemens → PhysicsX connections on LinkedIn"}],
+careers:"physicsx.com/careers"},
+
+{id:7,name:"Twenty Technologies",tagline:"Offensive cyber capabilities for US defense and enterprise clients",tags:["funded"],sector:"Cybersecurity / Defense Tech",stage:"Series B",amount:"$100M",valuation:"Undisclosed",date:"Jun 17",
+investors:["Accel","Caffeinated Capital","Friends & Family Capital","Point72 Ventures"],
+snippet:"Arlington-based defense tech raised $100M. Offensive cyber for US government. Now expanding to commercial enterprise — key product translation challenge underway.",
+parent_sub:"Independent, HQ'd in Arlington, VA (close to the Pentagon). No parent company. Strong ties to US intelligence and defense — IQT (CIA's venture arm) is likely an early customer or close partner given the nature of the product. Accel brings commercial enterprise GTM playbook to a defense-first company.",
+what_building:[
+  {t:"Offensive cyber platform",b:"Tools that simulate real-world cyberattacks on an organization's own infrastructure — used for red team exercises, penetration testing, and adversarial hardening."},
+  {t:"Threat emulation engine",b:"AI that generates realistic attack scenarios based on current threat actor TTPs (tactics, techniques, procedures) — automatically stays current with the threat landscape."},
+  {t:"Government deployment infrastructure",b:"Hardened, air-gapped deployment for classified environments — different architecture from the commercial product but the same underlying intelligence capability."},
+  {t:"Commercial enterprise expansion",b:"Post-Series B key challenge: translating government-grade capabilities into a product enterprise CISOs can buy without a clearance. This is the core PM problem right now."}
+],
+gtm:[
+  {n:1,t:"Government-first, commercial credibility",b:"Government contracts provide stable revenue and product validation. Commercial expansion uses the defense pedigree as credibility: 'used by US intelligence agencies' is a powerful enterprise trust signal.",tg:"Motion: government → commercial credibility transfer"},
+  {n:2,t:"Accel for commercial distribution",b:"Accel's portfolio and relationships open Fortune 500 CISO doors. Accel brings the enterprise GTM playbook that a defense-first company typically lacks.",tg:"Channel: Accel enterprise network and introductions"},
+  {n:3,t:"MSSP and red team partnerships",b:"Managed Security Service Providers and red team firms resell Twenty's platform as part of their service offering — extends reach without building a large direct sales team.",tg:"Channel: MSSP partner resell program"},
+  {n:4,t:"FedRAMP certification as moat",b:"FedRAMP authorization blocks competitors from federal agencies and signals security rigor to enterprise buyers — a regulatory moat that takes 12–18 months to replicate.",tg:"Moat: regulatory certification locks in government channel"}
+],
+why:"Rare crossover: government-grade product going commercial. Needs a PM who understands CISOs and can translate classified capabilities into something procurement teams can actually buy. BD background is a strong fit — navigating complex government-to-commercial transitions requires exactly your stakeholder skillset.",
+news:[
+  {t:"Raises $100M Series B led by Accel — expanding offensive cyber platform to enterprise clients beyond government",d:"Jun 17, 2026"},
+  {t:"CEO publicly stated plans to double engineering headcount in 2026 as commercial expansion accelerates",d:"Jun 2026"}
+],
+angle:[
+  {e:"🎯",t:"Your BD angle",b:"Twenty's biggest product challenge is commercialization — taking DoD-grade tools and packaging them for a Fortune 500 CISO. Your BD background means you have structured enterprise deals with complex stakeholders. That is exactly the mindset this product transition needs."},
+  {e:"📬",t:"Outreach",b:"Find the founders via LinkedIn (search: Twenty Technologies Arlington cybersecurity). Frame outreach around the commercial transition: 'I have been thinking about the product packaging challenge going from government to enterprise — here is my take.'"},
+  {e:"💡",t:"What to pitch",b:"Own the enterprise packaging of the offensive cyber platform — pricing model, compliance documentation, and sales collateral that makes a CISO's procurement team say yes without a security clearance."},
+  {e:"⚡",t:"48hr move",b:"Map your B2B SaaS network for anyone with cybersecurity or defense tech background — this company values domain credibility in product candidates."}
+],
+questions:[
+  {c:"Domain",q:"You do not have a cybersecurity background. How would you establish credibility with engineers and government customers in the first 90 days?",h:"Honest structured answer: identify SMEs to shadow, get relevant certifications (CompTIA Security+), run listening tours with existing customers before making any product recommendations."},
+  {c:"BD → PM",q:"How would you design a packaging and pricing model for an offensive cyber tool that works for both federal agencies and Fortune 500 CISOs?",h:"Fed buyers care about compliance and FedRAMP. Enterprise buyers care about ROI and ease of deployment. Think about what is shared vs. what needs to be different."},
+  {c:"Stakeholder",q:"Government customers and enterprise CISOs have very different risk tolerances and procurement processes. How do you build one product roadmap that serves both?",h:"Modular architecture thinking. What is shared infrastructure, what is vertical-specific. Show you can manage two segments without building two separate products."},
+  {c:"Strategic",q:"What is the risk of Twenty Technologies going commercial too quickly after a government-first start?",h:"Cultural mismatch, support model differences, pricing misalignment, and distraction from the government business that funds everything. Show strategic maturity."}
+],
+pms:[{n:"Founders (LinkedIn search)",r:"Search: Twenty Technologies Arlington + founder",t:"pm",nt:"Small team — founders own product and sales."},{n:"CISO-level contacts",r:"Their enterprise buyers — warm intros most valuable",t:"pm",nt:"Any CISO connections in your network = warm path in"}],
+connections:[{n:"Accel portfolio CISOs",r:"Accel backs many enterprise security companies",t:"cn",nt:"Accel → Twenty warm intro path via portfolio"},{n:"Defense tech PM community",r:"Tight-knit community in DC and Arlington",t:"cn",nt:"Search: defense tech + product manager + Washington DC"}],
+careers:"linkedin.com/company/twenty-technologies/jobs"},
+
+{id:8,name:"Invisible Narratives",tagline:"AI-powered tools for interactive storytelling and cinematic content creation",tags:["funded","news"],sector:"Media & Entertainment / Creative AI",stage:"Series A",amount:"$25M",valuation:"Undisclosed",date:"Jun 17",
+investors:["Undisclosed"],
+snippet:"Building AI tools for interactive storytelling. Series A = finding PMF. High creative energy, maximum PM impact opportunity.",
+parent_sub:"Independent company. No parent or publicly named strategic investors. Likely backed by media/entertainment VCs or creative tech angels — investor names not disclosed. No publicly announced studio or platform partnerships yet. Most comparable companies: Runway, Pika Labs, Kling — adjacent creative AI ecosystem.",
+what_building:[
+  {t:"AI cinematic scene generator",b:"Creators generate and control full cinematic scenes — scenery, characters, lighting, motion — all editable in real-time without traditional VFX pipelines."},
+  {t:"Interactive narrative engine",b:"Story branching logic lets creators build choose-your-own-adventure stories with AI-generated cinematics at each branch point."},
+  {t:"Creator monetization layer",b:"Tools for creators to publish, distribute, and monetize interactive stories — subscription, per-story, or audience-funded models."},
+  {t:"Collaboration and team workflows",b:"Multi-creator workflows for teams building interactive narratives: version control, review tools, and shared asset libraries for AI-generated scenes."}
+],
+gtm:[
+  {n:1,t:"Creator community-led growth",b:"Give indie filmmakers, game writers, and interactive fiction creators early access. Community builds on the platform and shares their work — drives organic discovery and word-of-mouth without paid acquisition.",tg:"Motion: creator community → viral content distribution"},
+  {n:2,t:"Platform partnership distribution",b:"Distribute interactive narratives through Netflix Games, Apple Arcade, or Roblox — platform deals bring existing audiences without building distribution from scratch.",tg:"Channel: gaming and streaming platform deals"},
+  {n:3,t:"B2B studio licensing",b:"License the underlying cinematic AI to game studios and production companies — B2B revenue alongside B2C creator subscriptions creates a dual-revenue model.",tg:"Dual model: B2C creator subscriptions + B2B studio licensing"},
+  {n:4,t:"IP development flywheel",b:"Best stories on the platform become candidates for full studio adaptation — Invisible Narratives as a creative IP incubator alongside its SaaS business.",tg:"Strategic: platform → IP development pipeline"}
+],
+why:"Series A = maximum PM impact. If you have creative instincts alongside your BD background, this is a 0→1 role defining the creator experience. Your BD skills map directly to the platform partnership motion — studio and distribution deals require exactly the deal-structuring instinct you bring.",
+news:[
+  {t:"Raises $25M Series A — building AI-native tools for cinematic interactive storytelling and creator monetization",d:"Jun 17, 2026"},
+  {t:"Flagship product enables creators to generate and control full cinematic scenes with AI — editing in real-time without VFX pipelines",d:"Jun 2026"}
+],
+angle:[
+  {e:"🎯",t:"Your BD angle",b:"Invisible Narratives needs platform deals (Netflix Games, Roblox, Apple Arcade) to scale distribution. Your BD background means you can think about how to make Invisible Narratives the obvious integration partner for a gaming or streaming platform."},
+  {e:"📬",t:"Outreach",b:"Find founders via LinkedIn or X. Frame it around the creative product challenge: 'I have been thinking about how you preserve creative agency when AI generates content automatically — here is my thinking.'"},
+  {e:"💡",t:"What to pitch",b:"Own the creator onboarding journey — run 10 research sessions with indie filmmakers and interactive fiction writers, define what creative control means to them, and translate into a product brief for the first 3 features."},
+  {e:"⚡",t:"48hr move",b:"Find the founders on LinkedIn or X and send a connection request with a personalized note about the specific creative AI product challenge you find most interesting."}
+],
+questions:[
+  {c:"Creative domain",q:"AI creative tools have a core tension: too much automation kills creative ownership, too little kills the value proposition. How do you find the right balance in product design?",h:"Philosophy and research question together. Show you would use discovery to find the threshold, not guess."},
+  {c:"BD → PM",q:"Invisible Narratives needs platform deals with Netflix Games or Roblox to scale. How would you design the product to make it easy for a platform to say yes to an integration?",h:"Think about what the platform PM needs: easy API, revenue share model, content moderation tools, audience analytics."},
+  {c:"User research",q:"Your users are indie filmmakers and interactive fiction writers. How would you run discovery with a creative community that is highly opinionated and values authenticity?",h:"Co-creation workshops, not just user interviews. Show you understand creative community culture and would not alienate early adopters."},
+  {c:"0→1",q:"It is your first 30 days. What do you do to understand the product and identify the most important thing to fix or build?",h:"Classic 30-60-90 question. Show structure: listen first (customers, team, data), form a hypothesis, propose a plan with clear success metrics."}
+],
+pms:[{n:"Founders (search LinkedIn)",r:"Search: Invisible Narratives + founder",t:"pm",nt:"Series A = founders own product. Direct access."},{n:"Creative AI PM community",r:"Runway, Pika, Kling — adjacent community",t:"pm",nt:"Creative AI is a small, connected PM ecosystem."}],
+connections:[{n:"Gaming and streaming platform PMs",r:"Netflix Games, Apple Arcade, Roblox PMs",t:"cn",nt:"Potential distribution partners — warm intro goldmine"},{n:"Indie film community",r:"Their core early user base",t:"cn",nt:"Sundance, A24 community overlap"}],
+careers:"Search: Invisible Narratives on LinkedIn Jobs"}
+];
+
+const RESUME = {
+  summary: "Product-minded B2B SaaS professional with 6.5+ years at Adobe, Anaplan, Salesforce, and BrowserStack. Specialises in customer discovery, use-case mapping, GTM strategy, customer journey analysis, stakeholder alignment, and cross-functional collaboration across India and US enterprise markets. Completing AI Product Management certification (HelloPM) covering PRD writing, product analytics, roadmapping, AI/LLM fundamentals, AI Agents, and Growth/PLG frameworks.",
+  skills: ["User & Market Research","Use-Case Discovery","PRD Creation","Roadmap & Prioritisation","Stakeholder Management","Data-Driven Decision Making","GTM Strategy","Customer Journey Analysis","AI Product Discovery","Prompt Engineering","AI Evals","LLMs (Claude/ChatGPT/Gemini)","Salesforce","LinkedIn Sales Navigator","Figma","Lovable","n8n","GitHub","Vercel","Framer","Notion","Mixpanel"],
+  experience: [
+    {role:"Senior BDR (US)",company:"BrowserStack",period:"Dec 2024–Apr 2026",highlights:["Structured account research and user segmentation across 100+ enterprise accounts","Mapped customer pain points and product use cases to identify unmet needs","$500K qualified pipeline, $105K closed revenue","Synthesised objections into structured product feedback for feature prioritisation"]},
+    {role:"Enterprise BDR",company:"Adobe",period:"Mar 2023–Dec 2024",highlights:["Greenfield market research for Adobe Experience Cloud, India market","$3M qualified pipeline — use cases directly informed GTM strategy","Prioritisation framework achieving 80% territory coverage in 4 months","Fastest recorded greenfield deal closure (2 months)"]},
+    {role:"Enterprise SDR",company:"Anaplan",period:"Jan 2021–Mar 2023",highlights:["Stakeholder mapping to identify decision-makers across enterprise accounts","$6M enterprise + $1.2M SMB pipeline, $1.54M closed revenue","Roadmap discussions on features to unlock expansion ARR","5 FY23 APAC performance awards"]},
+    {role:"Enterprise BDA",company:"Salesforce",period:"Apr 2019–Jun 2020",highlights:["CRM account research, territory planning, persona and org mapping","111 qualified opportunities, $2.8M pipeline influenced"]}
+  ],
+  education: "PGDM Marketing, Welingkar Institute (2017-2019). BBA Marketing, Pune University (2013-2016).",
+  strengths: ["Enterprise B2B discovery","GTM strategy","Stakeholder mapping","Customer pain point synthesis","Use-case translation","Cross-functional collaboration","Pipeline building","Account research","Greenfield market research"],
+  gaps: ["No shipped product yet (in progress via HelloPM capstone)","No formal PRD writing experience (learning)","No direct PM title held","SQL in progress","Jira in progress","No technical/engineering background","Limited AI/ML depth beyond tool usage"]
+};
+
+const JD_CRITERIA = {
+  1: {company:"Odyssey", jd_skills:["product discovery","user research","enterprise sales","AI/ML understanding","stakeholder alignment","roadmap prioritisation","0-to-1 product experience","technical PM","simulation/robotics domain"], must_have:["user research","enterprise B2B","stakeholder management","discovery frameworks"], nice_have:["AI/ML depth","technical background","robotics/AV domain","shipped product"]},
+  2: {company:"Behavox", jd_skills:["enterprise product management","compliance domain","onboarding experience","B2B SaaS","stakeholder management","GTM strategy","user research","data-driven decision making","fintech knowledge"], must_have:["enterprise B2B","stakeholder management","GTM strategy","user research"], nice_have:["compliance/regtech domain","fintech experience","product analytics","shipped product"]},
+  3: {company:"Forage", jd_skills:["consumer product","payments/fintech","user research","0-to-1","discovery","stakeholder management","platform partnerships","social impact","B2B2C"], must_have:["user research","discovery","stakeholder management","B2B experience"], nice_have:["fintech/payments","consumer product","0-to-1","social impact domain"]},
+  4: {company:"PointFive", jd_skills:["enterprise B2B SaaS","multi-stakeholder","CFO/CTO alignment","cloud/infra domain","product analytics","roadmap","data-driven","GTM","B2B sales experience"], must_have:["enterprise B2B","multi-stakeholder","GTM strategy","data-driven decision making"], nice_have:["cloud/infra domain","product analytics","FinOps knowledge","shipped product"]},
+  5: {company:"Coralogix", jd_skills:["developer-facing product","enterprise B2B","SRE/DevOps empathy","product analytics","onboarding experience","competitive positioning","roadmap","GTM","technical PM"], must_have:["enterprise B2B","GTM strategy","stakeholder management","competitive analysis"], nice_have:["technical/devtools domain","product analytics","developer empathy","shipped product"]},
+  6: {company:"PhysicsX", jd_skills:["industrial domain","technical PM","user research","enterprise B2B","stakeholder management","roadmap","0-to-1","partnership management","deep tech"], must_have:["user research","enterprise B2B","stakeholder management","discovery"], nice_have:["industrial/engineering domain","technical background","deep tech","shipped product"]},
+  7: {company:"Twenty Technologies", jd_skills:["enterprise B2B","cybersecurity domain","government/defense","stakeholder management","GTM","packaging/pricing","technical PM","competitive positioning"], must_have:["enterprise B2B","stakeholder management","GTM strategy","packaging/pricing instinct"], nice_have:["cybersecurity domain","defense/government","technical background","shipped product"]},
+  8: {company:"Invisible Narratives", jd_skills:["consumer product","0-to-1","user research","creative domain","platform partnerships","B2B licensing","community-led growth","storytelling/media"], must_have:["user research","0-to-1 thinking","discovery","stakeholder management"], nice_have:["creative/media domain","consumer product","platform deals","shipped product"]}
+};
+
+function scoreResume(cid) {
+  const criteria = JD_CRITERIA[cid];
+  if (!criteria) return null;
+  const resumeText = (RESUME.summary + " " + RESUME.skills.join(" ") + " " + RESUME.experience.map(e=>e.highlights.join(" ")).join(" ")).toLowerCase();
+  
+  const matchMap = {
+    "user research": resumeText.includes("user") && resumeText.includes("research"),
+    "enterprise b2b": resumeText.includes("enterprise"),
+    "enterprise b2b saas": resumeText.includes("enterprise") && resumeText.includes("saas"),
+    "gtm strategy": resumeText.includes("gtm"),
+    "stakeholder management": resumeText.includes("stakeholder"),
+    "discovery frameworks": resumeText.includes("discovery"),
+    "user research": resumeText.includes("user") && resumeText.includes("research"),
+    "data-driven decision making": resumeText.includes("data-driven"),
+    "roadmap": resumeText.includes("roadmap"),
+    "product analytics": resumeText.includes("analytics") || resumeText.includes("mixpanel"),
+    "multi-stakeholder": resumeText.includes("stakeholder"),
+    "0-to-1": false,
+    "0-to-1 product experience": false,
+    "0-to-1 thinking": false,
+    "shipped product": false,
+    "technical pm": false,
+    "technical/engineering background": false,
+    "technical background": false,
+    "ai/ml understanding": resumeText.includes("ai") || resumeText.includes("llm"),
+    "ai/ml depth": resumeText.includes("ai evals") || resumeText.includes("llm"),
+    "sql": resumeText.includes("sql"),
+    "jira": resumeText.includes("jira"),
+    "b2b sales experience": resumeText.includes("enterprise") && resumeText.includes("revenue"),
+    "b2b experience": resumeText.includes("enterprise"),
+    "cfo/cto alignment": resumeText.includes("stakeholder"),
+    "platform partnerships": resumeText.includes("cross-functional") || resumeText.includes("stakeholder"),
+    "competitive positioning": false,
+    "onboarding experience": resumeText.includes("onboard"),
+    "greenfield": resumeText.includes("greenfield"),
+    "prd creation": resumeText.includes("prd"),
+    "figma": resumeText.includes("figma"),
+    "fintech knowledge": false,
+    "fintech/payments": false,
+    "compliance domain": false,
+    "cybersecurity domain": false,
+    "defense/government": false,
+    "cloud/infra domain": false,
+    "industrial domain": false,
+    "industrial/engineering domain": false,
+    "creative domain": false,
+    "creative/media domain": false,
+    "robotics/av domain": false,
+    "simulation/robotics domain": false,
+    "deep tech": false,
+    "sre/devops empathy": false,
+    "developer-facing product": false,
+    "developer empathy": false,
+    "social impact domain": false,
+    "community-led growth": false,
+    "storytelling/media": false,
+    "consumer product": false,
+    "b2b2c": resumeText.includes("enterprise"),
+    "b2b licensing": resumeText.includes("enterprise"),
+    "discovery": resumeText.includes("discovery"),
+    "packaging/pricing instinct": resumeText.includes("pipeline") || resumeText.includes("revenue"),
+    "packaging/pricing": resumeText.includes("pipeline") || resumeText.includes("revenue"),
+    "partnership management": resumeText.includes("cross-functional"),
+    "cross-functional collaboration": resumeText.includes("cross-functional"),
+    "gtm": resumeText.includes("gtm"),
+  };
+  
+  let mustScore = 0, niceScore = 0;
+  const mustMatches = [], mustGaps = [], niceMatches = [], niceGaps = [];
+  
+  criteria.must_have.forEach(s => {
+    const key = s.toLowerCase();
+    const matched = matchMap[key] !== undefined ? matchMap[key] : resumeText.includes(key.split("/")[0]);
+    if (matched) { mustScore++; mustMatches.push(s); }
+    else mustGaps.push(s);
+  });
+  
+  criteria.nice_have.forEach(s => {
+    const key = s.toLowerCase();
+    const matched = matchMap[key] !== undefined ? matchMap[key] : resumeText.includes(key.split("/")[0]);
+    if (matched) { niceScore++; niceMatches.push(s); }
+    else niceGaps.push(s);
+  });
+  
+  const totalScore = Math.round(((mustScore / criteria.must_have.length) * 0.7 + (niceScore / criteria.nice_have.length) * 0.3) * 100);
+  
+  return { totalScore, mustMatches, mustGaps, niceMatches, niceGaps, mustScore, mustTotal: criteria.must_have.length, niceScore, niceTotal: criteria.nice_have.length };
+}
+
+function getTailoredEdits(cid, score) {
+  const edits = {
+    1: [
+      {bullet:"Reframe BrowserStack role opener", original:"Conducted structured account research and user segmentation across 100+ enterprise accounts...", suggested:"Led structured customer discovery and user segmentation across 100+ enterprise accounts — mapping behavioural signals to product use cases and feeding insights directly into roadmap prioritisation discussions."},
+      {bullet:"Add a 'discovery → product impact' sentence to Adobe role", original:"...generating a $3M qualified pipeline.", suggested:"...generating a $3M qualified pipeline and directly informing product GTM strategy through synthesised use-case mapping."},
+      {bullet:"Lead summary with AI/world model relevance", original:"Product-minded B2B SaaS professional with 6.5+ years...", suggested:"Product-minded professional with 6.5+ years translating enterprise customer insights into product strategy — now focused on AI product roles where discovery-led PM creates commercial value from cutting-edge research."}
+    ],
+    2: [
+      {bullet:"Add compliance-adjacent language to Anaplan role", original:"Mapped business units and subsidiaries across enterprise accounts...", suggested:"Mapped business units and subsidiaries across enterprise accounts, including regulated financial services clients — identifying compliance requirements and aligning product modules to regulatory workflows."},
+      {bullet:"Reframe BrowserStack product feedback bullet", original:"Synthesised objections and friction points from customer interactions into structured product feedback...", suggested:"Synthesised compliance and adoption objections from enterprise customers into structured product feedback — driving feature prioritisation for enterprise onboarding improvements."},
+      {bullet:"Add onboarding metric to summary", original:"...specialising in customer discovery, use-case mapping, and GTM strategy.", suggested:"...specialising in enterprise customer discovery, onboarding optimisation, and GTM strategy for regulated B2B markets."}
+    ],
+    3: [
+      {bullet:"Add mission-driven framing to Carl Zeiss experience", original:"Designed and executed a two-part mixed-method research study...", suggested:"Designed and executed mixed-method user research with 500+ respondents across underserved retail segments — synthesising findings into product and GTM recommendations with direct commercial impact."},
+      {bullet:"Reframe summary for B2B2C", original:"Product-minded B2B SaaS professional...", suggested:"Product-minded professional with B2B and consumer research experience — skilled at bridging enterprise partner needs and end-user workflows in platform products."},
+      {bullet:"Add partnership instinct to Adobe role", original:"...collaborated cross-functionally with marketing on product-led events...", suggested:"...collaborated cross-functionally with marketing and enterprise partners on product-led GTM events — managing multi-stakeholder alignment across platform distribution partners."}
+    ],
+    4: [
+      {bullet:"Add dual-stakeholder language to Anaplan role", original:"Mapped business units and subsidiaries across enterprise accounts to relevant Anaplan modules...", suggested:"Mapped enterprise accounts to product modules across both financial (CFO-level) and operational (VP-level) stakeholders — aligning product value to distinct buyer motivations within a single deal."},
+      {bullet:"Lead with commercial impact metric in summary", original:"Product-minded B2B SaaS professional with 6.5+ years...", suggested:"Product-minded B2B SaaS professional with 6.5+ years generating $12M+ in qualified pipeline — specialising in multi-stakeholder discovery, GTM strategy, and translating customer needs into product decisions."},
+      {bullet:"Add data-driven framing to BrowserStack role", original:"...identifying behavioural signals and expansion triggers to prioritise outreach...", suggested:"...identifying behavioural signals and data-driven expansion triggers to prioritise product use cases and outreach — achieving ~85% territory coverage within 6 months."}
+    ],
+    5: [
+      {bullet:"Add developer/technical buyer language to BrowserStack role", original:"Conducted structured account research and user segmentation across 100+ enterprise accounts...", suggested:"Conducted structured discovery and user segmentation across 100+ enterprise engineering and DevOps accounts — mapping technical pain points to product use cases for a developer-facing testing platform."},
+      {bullet:"Reframe Adobe GTM bullet to competitive positioning", original:"...directly informing GTM strategy and generating a $3M qualified pipeline.", suggested:"...directly informing competitive GTM strategy and positioning, generating a $3M qualified pipeline in a market with established incumbents."},
+      {bullet:"Add trial/POC language", original:"...achieved the fastest recorded deal closure for a greenfield account (2 months)...", suggested:"...achieved the fastest recorded deal closure for a greenfield account (2 months) by rapidly reducing time-to-value through use-case-aligned product positioning during the evaluation stage."}
+    ],
+    6: [
+      {bullet:"Add technical buyer empathy to Salesforce role", original:"Conducted enterprise org mapping to identify buying committees and decision-maker structures...", suggested:"Conducted enterprise org mapping to identify buying committees and technical decision-maker structures — translating complex organisational requirements into product-solution alignment for technical buyers."},
+      {bullet:"Reframe Carl Zeiss as research rigour signal", original:"Designed and executed a two-part mixed-method research study...", suggested:"Designed and executed a rigorous mixed-method user research study — defining the problem statement, methodology, and a custom metric (Brand Visibility Index) from scratch — a structured approach directly applicable to discovery in deep tech environments."},
+      {bullet:"Add domain-learning framing to summary", original:"Currently completing an AI Product Management certification (HelloPM)...", suggested:"Currently completing an AI Product Management certification (HelloPM) — with a capstone building and shipping an AI product end-to-end — complementing enterprise discovery skills with technical product foundations for deep tech roles."}
+    ],
+    7: [
+      {bullet:"Add enterprise packaging instinct to Anaplan role", original:"...contributing to roadmap discussions on features to unlock expansion ARR opportunities...", suggested:"...contributing to roadmap and commercial packaging discussions on features to unlock expansion ARR — translating complex product capabilities into simplified, buyer-ready value propositions for enterprise procurement."},
+      {bullet:"Reframe Adobe greenfield closure as commercialisation signal", original:"...achieved the fastest recorded deal closure for a greenfield account (2 months)...", suggested:"...achieved the fastest recorded deal closure for a greenfield account (2 months) by rapidly packaging an enterprise-grade solution for a net-new buyer — demonstrating the commercialisation instinct needed to translate capabilities into sales-ready products."},
+      {bullet:"Add multi-stakeholder complexity to summary", original:"...specialising in customer discovery, use-case mapping, and GTM strategy.", suggested:"...specialising in enterprise customer discovery, commercial packaging, and GTM strategy across multi-stakeholder procurement environments."}
+    ],
+    8: [
+      {bullet:"Add creator/community instinct to Carl Zeiss role", original:"Synthesised findings into actionable product and GTM recommendations...", suggested:"Synthesised research findings into actionable product, GTM, and community engagement recommendations — including a referral programme concept and doctor-partnership model demonstrating creator and community-led growth thinking."},
+      {bullet:"Reframe summary for creative/platform products", original:"Product-minded B2B SaaS professional with 6.5+ years...", suggested:"Product-minded professional with 6.5+ years in enterprise and consumer research — now focused on creative AI products where discovery-led PM defines the experience for highly opinionated creator communities."},
+      {bullet:"Add platform partnership angle to BrowserStack role", original:"...informing feature prioritisation discussions with internal stakeholders.", suggested:"...informing feature prioritisation and partner integration discussions with internal stakeholders — managing multi-sided product requirements across developer users and enterprise platform partners."}
+    ]
+  };
+  return edits[cid] || [];
+}
+
+// ─── APP STATE ───────────────────────────────────────────────────────────────
+let af="all", aid=null, at="overview", activeWeek="current";
+const TABS=[{id:"overview",l:"Overview"},{id:"product",l:"Product"},{id:"gtm",l:"GTM"},{id:"angle",l:"My Angle"},{id:"prep",l:"Prep"},{id:"linkedin",l:"LinkedIn"},{id:"match",l:"Resume Match"}];
+const STATUSES = [{key:"interested",label:"Interested"},{key:"contacted",label:"Contacted"},{key:"in-conversation",label:"In Conversation"},{key:"passed",label:"Passed"}];
+
+function getCompany(id) {
+  const {curr,prev} = taggedCompanies();
+  return [...curr,...prev].find(c=>c.id===id);
+}
+
+function switchWeek(w) {
+  activeWeek = w; aid = null;
+  document.querySelectorAll(".week-tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("tab-"+w).classList.add("active");
+  document.getElementById("feedTitle").textContent = w==="current"?"This week":w==="previous"?"Last week":"Archive";
+  document.getElementById("pe").style.display="flex";
+  document.getElementById("di").style.display="none";
+  document.getElementById("dp").classList.remove("open");
+  renderFeed();
+}
+
+function initTicker() {
+  const items = D.map(c=>`<span class="ticker-item"><span class="tdot ${c.tags[0]}"></span><strong style="color:var(--text);font-size:11px;">${c.name}</strong>&nbsp;<span class="tamount">${c.amount!=="Undisclosed"?c.amount:""}</span>&nbsp;${c.tags[0].toUpperCase()}</span>`).join("");
+  document.getElementById("ticker").innerHTML = items+items;
+}
+
+function statusBadgeHtml(company, week) {
+  const current = getStatus(company.id, week);
+  return '<div class="status-row">' + STATUSES.map(s=>
+    `<button class="status-btn ${s.key}${current===s.key?" active-status":""}" onclick="event.stopPropagation();setStatus(${company.id},'${week}','${s.key}')">${s.label}</button>`
+  ).join("") + `<span class="week-badge ${week===CURRENT_WEEK?"current":"previous"}">${week===CURRENT_WEEK?"This week":"Last week"}</span></div>`;
+}
+
+function renderFeed() {
+  const q = document.getElementById("search").value.toLowerCase();
+  const sf = document.getElementById("statusFilter").value;
+  const {curr,prev} = taggedCompanies();
+
+  if (activeWeek === "archive") {
+    const archiveHtml = `<div class="archive-section">
+      <div class="archive-header">Archived companies — older than 2 weeks</div>
+      <div style="text-align:center;padding:30px 20px;color:var(--text-muted);font-size:12px;">No archived companies yet. Companies move here after 2 weeks.</div>
+    </div>`;
+    document.getElementById("feed").innerHTML = archiveHtml;
+    document.getElementById("fc").textContent = "0 companies";
+    document.getElementById("count-archive").textContent = "0";
+    return;
+  }
+
+  const weekData = activeWeek === "current" ? curr : prev;
+  const week = activeWeek === "current" ? CURRENT_WEEK : PREV_WEEK;
+
+  const list = weekData.filter(c => {
+    const mf = af==="all" || c.tags.includes(af);
+    const ms = !q || c.name.toLowerCase().includes(q) || c.sector.toLowerCase().includes(q) || c.tagline.toLowerCase().includes(q);
+    const status = getStatus(c.id, week);
+    const mst = sf==="all" || (sf==="none" && !status) || sf===status;
+    return mf && ms && mst;
+  });
+
+  document.getElementById("fc").textContent = list.length+" compan"+(list.length===1?"y":"ies");
+  document.getElementById("count-current").textContent = curr.length;
+  document.getElementById("count-previous").textContent = prev.length;
+
+  document.getElementById("feed").innerHTML = list.length===0
+    ? '<div style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:12px;">No companies match.</div>'
+    : list.map(c => {
+        const status = getStatus(c.id, week);
+        const statusDot = status ? `<span style="width:6px;height:6px;border-radius:50%;display:inline-block;margin-left:6px;background:${status==="interested"?"var(--blue)":status==="contacted"?"var(--amber)":status==="in-conversation"?"var(--green)":"var(--coral)"}"></span>` : "";
+        return `<div class="company-card${aid===c.id?" active":""}${week===PREV_WEEK?" prev-week":""}" onclick="showDetail(${c.id})">
+          <div class="cr1"><div><div class="cname">${c.name}${statusDot}</div><div class="csector">${c.sector}</div></div><div class="tags">${c.tags.map(t=>`<span class="tag ${t}">${t}</span>`).join("")}</div></div>
+          <div class="cmeta"><span class="mchip">${c.stage}</span><span class="mchip"><span class="v">${c.amount}</span></span><span class="mchip">${c.date}</span></div>
+          <div class="csnip">${c.snippet}</div>
+          ${statusBadgeHtml(c, week)}
+        </div>`;
+      }).join("");
+}
+
+function showDetail(id) {
+  aid=id; at="overview";
+  renderFeed();
+  const c = getCompany(id);
+  document.getElementById("pe").style.display="none";
+  document.getElementById("di").style.display="block";
+  document.getElementById("dp").classList.add("open");
+  renderTabs(c); renderContent(c);
+  document.getElementById("dp").scrollTop=0;
+}
+
+function renderTabs(c) {
+  const week = c._week || CURRENT_WEEK;
+  const origId = c._origId || c.id;
+  document.getElementById("dt").innerHTML = TABS.map(t=>
+    `<div class="detail-tab${at===t.id?" active":""}" onclick="switchTab('${t.id}')">${t.l}</div>`
+  ).join("");
+
+  const status = getStatus(c.id, week);
+  const statusHtml = STATUSES.map(s=>
+    `<button class="status-btn ${s.key}${status===s.key?" active-status":""}" style="padding:4px 10px;font-size:11px;" onclick="setStatus(${c.id},'${week}','${s.key}')">${s.label}</button>`
+  ).join("");
+
+  document.getElementById("ab").innerHTML = `
+    <a href="https://${c.careers}" target="_blank" class="ab pr">Open roles &#8599;</a>
+    <a href="https://linkedin.com/search/results/people/?keywords=${encodeURIComponent(c.name+" product manager")}" target="_blank" class="ab se">Find PMs &#8599;</a>
+    <a href="https://linkedin.com/search/results/people/?keywords=${encodeURIComponent(c.name)}&network=%5B%22S%22%5D" target="_blank" class="ab gh">2nd&#176; &#8599;</a>
+    <button class="ab" style="background:var(--purple-dim);color:var(--purple);border-color:rgba(167,139,250,0.3);" onclick="showCLModal(${c.id})">&#9998; Cover letter</button>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;width:100%;">${statusHtml}</div>`;
+}
+
+function switchTab(tab) {
+  at=tab;
+  const c = getCompany(aid);
+  renderTabs(c); renderContent(c);
+  document.getElementById("db").scrollTop=0;
+}
+
+function hdr(c) {
+  return `<div class="dcname">${c.name.slice(0,-1)}<em>${c.name.slice(-1)}</em></div>
+    <div class="dctag">${c.tagline}</div>
+    <div class="dtags">${c.tags.map(t=>`<span class="tag ${t}">${t==="funded"?"&#128176; funded":t==="hiring"?"&#128993; hiring":"&#128240; news"}</span>`).join("")}&nbsp;<span style="font-size:10px;font-family:var(--mono);color:var(--text-muted);">${c.sector}</span></div>`;
+}
+
+function renderContent(c){
+  const db=document.getElementById("db");
+  if(at==="match"){
+    const sc = scoreResume(c.id);
+    const edits = getTailoredEdits(c.id, sc);
+    const scoreColor = sc.totalScore >= 70 ? "var(--teal)" : sc.totalScore >= 50 ? "var(--amber)" : "var(--coral)";
+    const scoreLabel = sc.totalScore >= 70 ? "Strong match" : sc.totalScore >= 50 ? "Good potential" : "Needs tailoring";
+    
+    const mustMatchHtml = sc.mustMatches.map(m=>`<span style="background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal-glow);font-size:11px;font-family:var(--mono);padding:3px 8px;border-radius:4px;display:inline-block;margin:2px;">✓ ${m}</span>`).join("");
+    const mustGapHtml = sc.mustGaps.map(m=>`<span style="background:var(--coral-dim);color:var(--coral);border:1px solid rgba(255,107,107,0.25);font-size:11px;font-family:var(--mono);padding:3px 8px;border-radius:4px;display:inline-block;margin:2px;">✗ ${m}</span>`).join("");
+    const niceMatchHtml = sc.niceMatches.map(m=>`<span style="background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal-glow);font-size:11px;font-family:var(--mono);padding:3px 8px;border-radius:4px;display:inline-block;margin:2px;">✓ ${m}</span>`).join("");
+    const niceGapHtml = sc.niceGaps.map(m=>`<span style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border);font-size:11px;font-family:var(--mono);padding:3px 8px;border-radius:4px;display:inline-block;margin:2px;">○ ${m}</span>`).join("");
+    
+    const editsHtml = edits.map(e=>`
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;">
+        <div style="font-size:11px;font-family:var(--mono);color:var(--amber);margin-bottom:8px;">✏ ${e.bullet}</div>
+        <div style="margin-bottom:8px;">
+          <div style="font-size:10px;font-family:var(--mono);color:var(--text-muted);margin-bottom:3px;">CURRENT</div>
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.5;background:var(--bg);border-radius:6px;padding:8px 10px;border-left:2px solid var(--text-muted);">${e.original}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-family:var(--mono);color:var(--teal);margin-bottom:3px;">SUGGESTED</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.5;background:var(--teal-dim);border-radius:6px;padding:8px 10px;border-left:2px solid var(--teal);">${e.suggested}</div>
+        </div>
+      </div>`).join("");
+    
+    db.innerHTML=hdr(c)+`
+      <div class="sec">
+        <div class="sl">Match score</div>
+        <div style="display:flex;align-items:center;gap:20px;margin-bottom:16px;">
+          <div style="position:relative;width:80px;height:80px;flex-shrink:0;">
+            <svg viewBox="0 0 80 80" style="width:80px;height:80px;transform:rotate(-90deg);">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="var(--border)" stroke-width="6"/>
+              <circle cx="40" cy="40" r="32" fill="none" stroke="${scoreColor}" stroke-width="6" stroke-dasharray="${Math.round(sc.totalScore * 2.01)} 201" stroke-linecap="round"/>
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+              <div style="font-size:18px;font-weight:600;font-family:var(--mono);color:${scoreColor};">${sc.totalScore}</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:16px;font-weight:500;color:${scoreColor};margin-bottom:4px;">${scoreLabel}</div>
+            <div style="font-size:12px;color:var(--text-secondary);">Must-haves: ${sc.mustScore}/${sc.mustTotal} matched</div>
+            <div style="font-size:12px;color:var(--text-secondary);">Nice-to-haves: ${sc.niceScore}/${sc.niceTotal} matched</div>
+          </div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:10px;font-family:var(--mono);color:var(--text-muted);margin-bottom:6px;">MUST-HAVES</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">${mustMatchHtml}${mustGapHtml}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-family:var(--mono);color:var(--text-muted);margin-bottom:6px;">NICE-TO-HAVES</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">${niceMatchHtml}${niceGapHtml}</div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sl">Resume edits to tailor for ${c.name}</div>
+        ${editsHtml}
+      </div>
+      <div class="sec">
+        <div class="sl">Your honest gap analysis</div>
+        <div class="hb ha" style="font-size:12px;line-height:1.8;">
+          <strong>What's genuinely strong:</strong> Enterprise B2B discovery, GTM strategy, stakeholder mapping, use-case translation, and cross-functional collaboration are all well evidenced across Adobe, Anaplan, BrowserStack, and Salesforce.<br><br>
+          <strong>The honest gaps:</strong> No shipped product yet (HelloPM capstone will address this), no formal PM title, SQL and Jira in progress, no deep technical background. These are real gaps but not dealbreakers at the right company — especially pre-PMF and Series A/B companies that value BD-to-PM transitions.<br><br>
+          <strong>Your strongest bet:</strong> Companies in scale mode (Series B/C) with an enterprise GTM motion where your BD-to-discovery translation is a genuine differentiator — not just background noise.
+        </div>
+      </div>`;
+  } else if(at==="overview"){
+    db.innerHTML=hdr(c)+`
+      <div class="sec"><div class="sl">Funding snapshot</div>
+        <div class="stat-grid">
+          <div class="stat-box"><div class="slabel">raised</div><div class="sval">${c.amount}</div></div>
+          <div class="stat-box"><div class="slabel">valuation</div><div class="sval" style="font-size:12px;">${c.valuation}</div></div>
+          <div class="stat-box"><div class="slabel">stage</div><div class="sval w">${c.stage}</div></div>
+        </div>
+        <div class="chips">${c.investors.map(i=>`<span class="chip">${i}</span>`).join("")}</div>
+      </div>
+      <div class="sec"><div class="sl">Latest news</div>${c.news.map(n=>`<div class="ni"><div class="ndot"></div><div><div class="ntext">${n.t}</div><div class="ndate">${n.d}</div></div></div>`).join("")}</div>
+      <div class="sec"><div class="sl">Parent / subsidiary / key relationships</div><div class="hb hbl">${c.parent_sub}</div></div>
+      <div class="sec"><div class="sl">Why this is your opening</div><div class="hb ht">${c.why}</div></div>`;
+  } else if(at==="product"){
+    db.innerHTML=hdr(c)+`<div class="sec"><div class="sl">What they're building</div><div class="feature-grid">${c.what_building.map(f=>`<div class="fc"><div class="ftitle">${f.t}</div><div class="fbody">${f.b}</div></div>`).join("")}</div></div>`;
+  } else if(at==="gtm"){
+    db.innerHTML=hdr(c)+`<div class="sec"><div class="sl">Go-to-market strategy</div>${c.gtm.map(g=>`<div class="gs"><div class="gnum">${g.n}</div><div><div class="gtitle">${g.t}</div><div class="gbody">${g.b}</div><div class="gtag">${g.tg}</div></div></div>`).join("")}</div>`;
+  } else if(at==="angle"){
+    db.innerHTML=hdr(c)+`<div class="sec"><div class="sl">Your BD-to-PM entry path</div><div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">${c.angle.map(a=>`<div class="as"><div class="ae">${a.e}</div><div><div class="atitle">${a.t}</div><div class="abody">${a.b}</div></div></div>`).join("")}</div></div>`;
+  } else if(at==="prep"){
+    db.innerHTML=hdr(c)+`<div class="sec"><div class="sl">Interview questions to prepare</div>${c.questions.map(q=>`<div class="qi"><div class="qcat">${q.c}</div><div class="qtext">${q.q}</div><div class="qhint">&#128161; ${q.h}</div></div>`).join("")}</div>`;
+  } else if(at==="linkedin"){
+    const pms=c.pms.map(p=>`<div class="pc"><div class="av pm">${p.n.split(" ").map(x=>x[0]).join("").slice(0,2)}</div><div class="pi"><div class="pname">${p.n}</div><div class="prole">${p.r}</div><div class="pnote">${p.nt}</div></div><span class="pb pm">PM+</span></div>`).join("");
+    const cns=c.connections.map(p=>`<div class="pc"><div class="av cn">${p.n.split(" ").slice(0,2).map(x=>x[0]).join("")}</div><div class="pi"><div class="pname">${p.n}</div><div class="prole">${p.r}</div><div class="pnote">${p.nt}</div></div><span class="pb cn">2nd&#176;</span></div>`).join("");
+    db.innerHTML=hdr(c)+`
+      <div class="sec"><div class="sl">PMs &amp; above at ${c.name}</div>${pms}
+        <a href="https://linkedin.com/search/results/people/?keywords=${encodeURIComponent(c.name+" product manager")}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);text-decoration:none;font-family:var(--mono);margin-top:12px;">Search all PMs at ${c.name} &#8599;</a>
+      </div>
+      <div class="sec"><div class="sl">Warm connection paths</div>${cns}
+        <a href="https://linkedin.com/search/results/people/?keywords=${encodeURIComponent(c.name)}&network=%5B%22S%22%5D" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);text-decoration:none;font-family:var(--mono);margin-top:12px;">Find 2nd&#176; connections at ${c.name} &#8599;</a>
+      </div>
+      <div class="sec"><div class="sl">Cold DM template</div>
+        <div class="hb ha" style="font-size:12px;line-height:1.8;">Hi [Name], I have been following ${c.name}'s work on [specific recent news or product detail]. I come from a BD background and am moving into PM roles — I have been thinking about [specific product or GTM challenge you identified]. Would love to exchange notes for 15 mins if you are open to it.</div>
+      </div>`;
+  }
+}
+
+
+
+var clCurrentPrompt = "";
+
+function showCLModal(id) {
+  const c = getCompany(id);
+  if (!c) return;
+
+  document.getElementById("clCompanyName").textContent = c.name;
+  document.getElementById("clEmptyText").textContent = "Your tailored cover letter for " + c.name + " will appear here.";
+  document.getElementById("clEmpty").style.display = "flex";
+  document.getElementById("clLetter").style.display = "none";
+  document.getElementById("clLetter").textContent = "";
+  document.getElementById("clStatus").textContent = "Click Generate to write your story-led cover letter.";
+  document.getElementById("clCopyBtn").disabled = true;
+  document.getElementById("clCopyBtn").style.opacity = "0.4";
+  document.getElementById("clModal").style.display = "flex";
+
+  clCurrentPrompt = "You are a world-class cover letter writer specialising in career transitions into PM roles. " +
+    "Write a story-led cover letter for Vaishnavi Pai applying to a PM role at " + c.name + ". " +
+    "CANDIDATE: 6.5 years enterprise B2B at Adobe Anaplan Salesforce BrowserStack. Specialises in customer discovery use-case mapping GTM strategy. " +
+    "Completing HelloPM AI Product Management certification covering PRD writing product analytics roadmapping AI LLM fundamentals and a capstone shipping a real AI product with live users. " +
+    "Key moments: At BrowserStack structured discovery across 100 plus enterprise accounts mapped pain points to product use cases synthesised objections into feature prioritisation. " +
+    "At Adobe greenfield research directly informed GTM strategy 3M pipeline fastest greenfield closure in 2 months by finding unmet need. " +
+    "At Anaplan stakeholder mapping contributed to roadmap discussions on expansion ARR features. " +
+    "At Carl Zeiss 500-respondent mixed-method study invented Brand Visibility Index metric proposed UX improvements to customer portal. " +
+    "COMPANY: " + c.name + ". " + c.tagline + ". Raised " + c.amount + " " + c.stage + ". " +
+    "What they build: " + c.what_building.map(function(w){return w.t;}).join(", ") + ". " +
+    "Why this is her opening: " + c.why + ". " +
+    "Her specific BD angle: " + c.angle[0].b + ". " +
+    "INSTRUCTIONS: Do NOT open with job title or say I am a BDR. " +
+    "OPEN with a vivid specific moment from her experience showing PM thinking. Name the company situation and insight. Make it concrete. " +
+    "SECOND paragraph: connect to why THIS company specifically. Reference their product or GTM. What she would own as PM. " +
+    "THIRD paragraph: 2 to 3 sentences of credibility. HelloPM cert in progress relevant skills BD background reframed as PM asset. " +
+    "CLOSE: one confident sentence. No apologising for the transition. " +
+    "TONE: conversational direct reads like a sharp human. No cliches. No excited to or passionate about. " +
+    "LENGTH: 3 paragraphs plus sign-off under 300 words. " +
+    "Start with: Dear [Hiring Manager Name], " +
+    "End with: Warm regards, Vaishnavi Pai | vaishnavi.p.we@gmail.com | linkedin.com/in/vaishnavi-pai-8b6125a4";
+}
+
+function hideCLModal() {
+  document.getElementById("clModal").style.display = "none";
+}
+
+async function clGenerate() {
+  const genBtn = document.getElementById("clGenBtn");
+  const copyBtn = document.getElementById("clCopyBtn");
+  const status = document.getElementById("clStatus");
+  const empty = document.getElementById("clEmpty");
+  const letter = document.getElementById("clLetter");
+
+  genBtn.disabled = true;
+  genBtn.style.opacity = "0.5";
+  copyBtn.disabled = true;
+  copyBtn.style.opacity = "0.4";
+  status.textContent = "Writing your story-led cover letter...";
+  empty.style.display = "none";
+  letter.style.display = "block";
+  letter.textContent = "...";
+
+  try {
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        messages: [{role: "user", content: clCurrentPrompt}]
+      })
+    });
+    if (!resp.ok) throw new Error("API error " + resp.status);
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+    const text = (data.content || []).map(function(b){ return b.type === "text" ? b.text : ""; }).join("");
+    letter.textContent = text;
+    status.textContent = "Done — edit directly, then copy or print.";
+    copyBtn.disabled = false;
+    copyBtn.style.opacity = "1";
+  } catch(e) {
+    status.textContent = "Error: " + e.message;
+    letter.style.display = "none";
+    empty.style.display = "flex";
+  }
+
+  genBtn.disabled = false;
+  genBtn.style.opacity = "1";
+}
+
+function clCopy() {
+  const text = document.getElementById("clLetter").textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    const btn = document.getElementById("clCopyBtn");
+    const orig = btn.textContent;
+    btn.textContent = "Copied!";
+    setTimeout(function(){ btn.textContent = orig; }, 2000);
+  });
+}
+
+function clPrint() {
+  const letter = document.getElementById("clLetter").textContent;
+  const name = document.getElementById("clCompanyName").textContent;
+  const w = window.open("", "_blank");
+  w.document.write("<html><head><title>Cover letter - " + name + "</title><style>body{font-family:Georgia,serif;font-size:14px;line-height:1.8;max-width:600px;margin:40px auto;color:#000;white-space:pre-wrap;}</style></head><body>" + letter.replace(/</g,"&lt;").replace(/>/g,"&gt;") + "</body></html>");
+  w.document.close();
+  w.print();
+}
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("weekLabel").textContent = "Week of " + formatWeekLabel(CURRENT_WEEK);
+  document.querySelectorAll(".filter-btn").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".filter-btn").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); af=b.dataset.filter; renderFeed();
+  }));
+  document.getElementById("search").addEventListener("input", renderFeed);
+  var m = document.getElementById("clModal");
+  if (m) m.addEventListener("click", function(e){ if (e.target===this) hideCLModal(); });
+  initTicker();
+  renderFeed();
+});
+</script>
+
+<!-- COVER LETTER MODAL -->
+<div id="clModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#131929;border:1px solid rgba(255,255,255,0.13);border-radius:16px;width:100%;max-width:680px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+      <div>
+        <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:300;color:#F5F2EB;">Cover letter — <em style="font-style:italic;color:#00C9A7;" id="clCompanyName"></em></div>
+        <div style="font-size:11px;color:#4E5A70;font-family:'JetBrains Mono',monospace;margin-top:3px;">Story-led · BD-to-PM transition · Vaishnavi Pai</div>
+      </div>
+      <button onclick="hideCLModal()" style="background:transparent;border:1px solid rgba(255,255,255,0.07);border-radius:6px;color:#4E5A70;font-size:12px;padding:6px 10px;cursor:pointer;font-family:'Inter',sans-serif;">✕</button>
+    </div>
+    <div style="padding:16px 24px 10px;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,0.07);">
+      <button id="clGenBtn" onclick="clGenerate()" style="background:#A78BFA;color:#0B0F1A;border:1px solid #A78BFA;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;">✎ Generate</button>
+      <button id="clCopyBtn" disabled onclick="clCopy()" style="background:transparent;color:#A78BFA;border:1px solid rgba(167,139,250,0.3);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;opacity:0.4;">Copy</button>
+      <button onclick="clPrint()" style="background:transparent;color:#8A93A8;border:1px solid rgba(255,255,255,0.13);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;">Print / PDF</button>
+    </div>
+    <div id="clStatus" style="padding:10px 24px;font-size:12px;font-family:'JetBrains Mono',monospace;color:#4E5A70;border-bottom:1px solid rgba(255,255,255,0.07);">Click Generate to write your story-led cover letter.</div>
+    <div style="flex:1;overflow-y:auto;padding:24px;">
+      <div id="clEmpty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;color:#4E5A70;text-align:center;gap:8px;">
+        <div style="font-size:28px;opacity:0.2;">✎</div>
+        <div style="font-size:13px;max-width:240px;line-height:1.5;" id="clEmptyText">Your tailored cover letter will appear here.</div>
+      </div>
+      <div id="clLetter" contenteditable="true" style="display:none;font-size:14px;line-height:1.85;color:#F5F2EB;white-space:pre-wrap;outline:none;font-family:'Inter',sans-serif;"></div>
+    </div>
+    <div style="padding:10px 24px;border-top:1px solid rgba(255,255,255,0.07);">
+      <div style="font-size:11px;color:#4E5A70;font-family:'JetBrains Mono',monospace;">Tip: the letter is fully editable — click any line to adjust before sending. Generate again for a different story hook.</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
