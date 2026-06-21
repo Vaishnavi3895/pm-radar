@@ -2,7 +2,7 @@
 
 **A personal PM job-hunting intelligence tool — built to help BD professionals transition into product management.**
 
-Live at: `[your-url].netlify.app`
+Live at: `pm-radar-1yart.vercel.app`
 
 ---
 
