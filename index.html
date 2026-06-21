@@ -172,6 +172,32 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:4px;}
 @media(max-width:860px){.main{grid-template-columns:1fr;}.feed{height:auto;position:static;}.detail-panel{height:auto;position:static;border-top:1px solid var(--border);display:none;}.detail-panel.open{display:block;}.feature-grid{grid-template-columns:1fr;}}
 @media(prefers-reduced-motion:reduce){.ticker-inner,.live-dot{animation:none;}}
+
+/* PRIMARY NAV */
+.primary-nav{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;}
+.primary-tab{padding:12px 20px;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.15s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
+.primary-tab:hover{color:var(--text-secondary);}
+.primary-tab.active{color:var(--text);border-bottom-color:var(--teal);}
+.ptag{font-size:10px;font-family:var(--mono);background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal-glow);border-radius:10px;padding:1px 7px;}
+.newtag{font-size:10px;font-family:var(--mono);background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,166,35,0.3);border-radius:10px;padding:1px 7px;}
+/* SECTION PANELS */
+.section-panel{display:none;}.section-panel.active{display:block;}
+/* JOB CARDS */
+.job-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden;}
+.job-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:background 0.15s;}
+.job-card:hover{background:var(--card-hover);border-color:var(--border-strong);}
+.job-card:hover::before,.job-card.active::before{background:var(--amber);}
+.job-card.active{background:var(--card-hover);border-color:rgba(245,166,35,0.3);}
+.jname{font-size:15px;font-weight:600;color:var(--text);}
+.jrole{font-size:13px;color:var(--teal);margin-top:2px;font-weight:500;}
+.jmeta{display:flex;gap:10px;margin:6px 0;flex-wrap:wrap;}
+.jchip{font-size:11px;font-family:var(--mono);color:var(--text-muted);}
+.jchip .v{color:var(--amber);}
+.jsnip{font-size:12px;color:var(--text-secondary);line-height:1.5;}
+.jhint{font-size:10px;font-family:var(--mono);color:var(--amber);margin-top:6px;opacity:0.7;}
+.jlevel{font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:4px;background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,166,35,0.25);}
+.jremote{font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:4px;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(96,165,250,0.25);}
+.jobs-filters{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 </style>
 </head>
 <body>
@@ -188,6 +214,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15
 
 <div class="new-banner" id="newBanner">&#9733; New companies added this week — scroll down to see them</div>
 
+<div class="primary-nav">
+  <div class="primary-tab active" id="ptab-radar" onclick="switchPrimary('radar')">
+    Funded Radar <span class="ptag">weekly</span>
+  </div>
+  <div class="primary-tab" id="ptab-jobs" onclick="switchPrimary('jobs')">
+    PM Jobs <span class="newtag">new</span>
+  </div>
+</div>
+<div id="panel-radar" class="section-panel active">
 <div class="week-nav">
   <div class="week-tab active" id="tab-current" onclick="switchWeek('current')">This week <span class="wcount" id="count-current">8</span></div>
   <div class="week-tab" id="tab-previous" onclick="switchWeek('previous')">Last week <span class="wcount" id="count-previous">8</span></div>
@@ -1163,6 +1198,270 @@ document.addEventListener("DOMContentLoaded", function() {
   initTicker();
   renderFeed();
 });
+
+// ── PM JOBS ──────────────────────────────────────────────────────────────────
+const JOBS = [
+  {id:201,company:"Notion",role:"Associate Product Manager",level:"apm",location:"San Francisco / Remote",remote:true,salary:"$120K-$150K",posted:"Jun 16",
+   tagline:"The connected workspace for docs, wikis, and projects",sector:"Productivity / SaaS",stage:"Series C",amount:"$275M",investors:["Sequoia","Index Ventures","Coatue"],
+   snippet:"One of the best APM entry points in tech. Work on core product surfaces with strong mentorship. No prior PM title required.",
+   jd_summary:"Work on core Notion surfaces: editor, databases, or AI features. Run discovery, write specs, partner with design and engineering. Looking for strong analytical and user empathy skills.",
+   why:"Notion APM program is designed for career transitioners. Your enterprise B2B background at Adobe and Salesforce is a strong signal for their enterprise product team.",
+   what_building:[{t:"Connected workspace",b:"All-in-one docs, wikis, databases, and projects. 100M+ users."},{t:"Notion AI",b:"AI writing, summarisation, and Q&A — fastest-growing feature."},{t:"Notion Calendar",b:"Standalone calendar integrating with the workspace."},{t:"Enterprise product",b:"SSO, audit logs, advanced permissions — targeting Fortune 500."}],
+   gtm:[{n:1,t:"PLG to enterprise",b:"Free tier drives individual adoption, teams self-organise, enterprise contract follows.",tg:"Bottom-up: user to team to company"},{n:2,t:"AI as upgrade hook",b:"Notion AI is the primary paid upgrade driver — free users hit the limit and convert.",tg:"Feature-gated upsell"},{n:3,t:"Template marketplace",b:"Community-built templates drive organic discovery and onboarding.",tg:"Community-led growth"},{n:4,t:"Enterprise direct sales",b:"Dedicated team for 500+ seat deals targeting IT and ops buyers.",tg:"Enterprise: direct + IT champion"}],
+   angle:[{e:"Target",t:"Your BD angle",b:"You have sold SaaS to enterprise buyers. Notion values people who understand how companies actually buy software. Frame yourself as the PM who can close the loop between enterprise user needs and what the product ships."},{e:"Outreach",t:"Outreach",b:"Apply via notion.so/careers. In your cover note reference a specific Notion feature you would improve for enterprise users such as audit logs, permissions, or the admin experience."},{e:"Pitch",t:"What to pitch",b:"The enterprise admin experience — it is the number one reason IT teams reject Notion. Your discovery background lets you interview IT admins and map the friction."},{e:"Now",t:"48hr move",b:"Apply now — APM programs fill fast. Lead your resume with discovery and user research bullets."}],
+   questions:[{c:"Product sense",q:"Notion's editor is its core surface. What is one thing you would improve and why?",h:"Show you use the product. Pick something specific — not better AI but a concrete friction point."},{c:"BD to PM",q:"You come from a BD background. How does that help you as a PM at a PLG company like Notion?",h:"Talk about understanding the buyer journey and what makes enterprise customers say yes."},{c:"Metrics",q:"How would you measure the success of a new Notion AI feature?",h:"Adoption rate, retention impact, upgrade conversion."},{c:"Research",q:"How would you decide what to build next for the enterprise admin experience?",h:"Discovery sprint: interview IT admins, map friction, identify the highest-value unlock."}],
+   pms:[{n:"Akshay Kothari",r:"Co-Founder and CPO",t:"pm",nt:"Active on LinkedIn and X."},{n:"APM Program team",r:"Search: Notion + APM + LinkedIn",t:"pm",nt:"Past APMs share their experience publicly."}],
+   connections:[{n:"Notion APM alumni",r:"Search: Notion + Associate Product Manager",t:"cn",nt:"Past APMs are very open to chatting."},{n:"Sequoia portfolio network",r:"Sequoia is an investor",t:"cn",nt:"Sequoia PM community is active."}],
+   careers:"notion.so/careers",li_people:"https://www.linkedin.com/company/notionhq/people/",li_jobs:"https://www.linkedin.com/company/notionhq/jobs/"},
+
+  {id:202,company:"Razorpay",role:"Associate Product Manager",level:"apm",location:"Bengaluru, India",remote:false,salary:"18-25 LPA",posted:"Jun 13",
+   tagline:"India's leading payments and business banking platform",sector:"FinTech / Payments",stage:"Series F",amount:"$741M",investors:["Sequoia India","GV","Tiger Global","Y Combinator"],
+   snippet:"Razorpay APM program is India's most competitive entry point into PM. Bengaluru-based, massive scale, 8M+ business customers.",
+   jd_summary:"Work on payment products serving 8M+ businesses. Run discovery with merchants, write PRDs, own feature metrics. Looking for analytical thinkers with strong user empathy.",
+   why:"Razorpay is the gold standard APM program in India, based in Bengaluru. Your Salesforce and Anaplan experience with financial services clients gives you domain credibility most APM candidates lack.",
+   what_building:[{t:"Payment gateway",b:"Core payment processing for 8M+ Indian businesses — UPI, cards, netbanking, wallets."},{t:"RazorpayX banking",b:"Current accounts, payroll, and vendor payments for SMEs — fastest-growing product line."},{t:"Razorpay Capital",b:"Lending and working capital for merchants based on payment history."},{t:"International payments",b:"Cross-border payments for Indian businesses selling globally."}],
+   gtm:[{n:1,t:"Developer-first distribution",b:"APIs first — developers integrate Razorpay, businesses follow.",tg:"PLG: developer adoption to business"},{n:2,t:"SME direct sales",b:"Dedicated team for mid-market merchants across India.",tg:"Direct: SME sales motion"},{n:3,t:"Enterprise platform deals",b:"Large enterprise deals with Zomato and Swiggy tier companies.",tg:"Enterprise: platform partnership"},{n:4,t:"Ecosystem lock-in",b:"Payment gateway + banking + capital = very high switching cost.",tg:"Multi-product stickiness"}],
+   angle:[{e:"Target",t:"Your BD angle",b:"You have sold enterprise SaaS in India at Adobe and Anaplan. You understand the Indian enterprise buyer better than most APM applicants. Frame your merchant discovery instinct as your differentiator."},{e:"Outreach",t:"Outreach",b:"Apply via razorpay.com/jobs. Reference your India market experience at Adobe explicitly — $3M pipeline in India is directly relevant."},{e:"Pitch",t:"What to pitch",b:"The merchant onboarding experience for RazorpayX — SME owners are time-poor and tech-averse. Your discovery skills can map where friction kills the first transaction."},{e:"Now",t:"48hr move",b:"Sign up for a Razorpay test account and go through onboarding as a merchant."}],
+   questions:[{c:"India market",q:"What is the biggest friction point for an SME merchant integrating Razorpay for the first time?",h:"Show you understand the Indian SME buyer — not tech-savvy, time-poor, WhatsApp-first."},{c:"BD to PM",q:"You have sold enterprise SaaS in India. How does that translate to building products for Indian merchants?",h:"Decision-maker hierarchy, role of trust and relationships, what makes Indian buyers say yes."},{c:"Metrics",q:"What KPIs would you track for the merchant activation funnel?",h:"Time-to-first-transaction, integration completion rate, support ticket volume in week 1."},{c:"Strategic",q:"How would you cross-sell RazorpayX banking to an existing payments merchant?",h:"Trigger moments — when does a merchant naturally want a current account?"}],
+   pms:[{n:"Harshil Mathur",r:"Co-Founder and CEO",t:"pm",nt:"Active on LinkedIn. Vocal about product culture."},{n:"Razorpay product team",r:"Search: Razorpay + Product Manager on LinkedIn",t:"pm",nt:"Large visible team."}],
+   connections:[{n:"Razorpay APM alumni",r:"Search: Razorpay + Associate Product Manager",t:"cn",nt:"Very active alumni community in Bengaluru fintech."},{n:"Sequoia India portfolio",r:"Sequoia India is an investor",t:"cn",nt:"Strong fintech PM community."}],
+   careers:"razorpay.com/jobs",li_people:"https://www.linkedin.com/company/razorpay/people/",li_jobs:"https://www.linkedin.com/company/razorpay/jobs/"},
+
+  {id:203,company:"Sarvam AI",role:"Product Manager",level:"pm",location:"Bengaluru, India",remote:false,salary:"20-35 LPA",posted:"Jun 17",
+   tagline:"Building India own AI — foundation models for 22 Indian languages",sector:"AI / Deep Tech",stage:"Series B",amount:"$41M",investors:["Peak XV","Lightspeed","Khosla Ventures"],
+   snippet:"The most exciting AI startup in India right now. Early-stage PM role with massive impact. Your HelloPM AI cert is a direct signal for this role.",
+   jd_summary:"Own product surfaces for Sarvam AI APIs and consumer apps. Work with researchers and engineers to translate model capabilities into developer tools. Looking for someone excited about India-first AI.",
+   why:"Sarvam is actively hiring PMs and your Adobe India experience gives you direct insight into Indian enterprise buyers — critical for their API GTM. HelloPM AI cert is a direct signal.",
+   what_building:[{t:"Indian language models",b:"Foundation models for Hindi, Tamil, Telugu, Kannada, and 18 more Indian languages."},{t:"Sarvam APIs",b:"Developer APIs for speech-to-text, translation, and text generation."},{t:"Consumer AI apps",b:"Voice-first AI assistants for Indian consumers — Sarvam Vaani."},{t:"Enterprise AI",b:"Custom AI deployments for Indian government and enterprise — BFSI, healthcare, education."}],
+   gtm:[{n:1,t:"Government as anchor customer",b:"Indian government contracts provide revenue and validation for enterprise expansion.",tg:"Government-first: public sector anchor"},{n:2,t:"Developer API distribution",b:"Open API access for Indian developers — build the ecosystem of apps on Sarvam models.",tg:"PLG: developer ecosystem"},{n:3,t:"Enterprise direct sales",b:"Custom AI for BFSI, telecom, and healthcare — high ACV, long cycles.",tg:"Enterprise: direct sales"},{n:4,t:"India-first positioning",b:"Made in India for India resonates with buyers who want data sovereignty.",tg:"Positioning: data sovereignty moat"}],
+   angle:[{e:"Target",t:"Your BD angle",b:"You have sold enterprise software in India. You understand why Indian enterprises prefer local solutions — trust requirements, procurement, data sovereignty. That is Sarvam core GTM challenge."},{e:"Outreach",t:"Outreach",b:"Reach founders Vivek Raghavan or Pratyush Kumar on LinkedIn. Lead with: I have sold enterprise AI tools to Indian companies and understand why they prefer India-built solutions."},{e:"Pitch",t:"What to pitch",b:"The developer onboarding experience for Sarvam APIs — a smooth API experience determines whether Sarvam becomes the default Indian language AI stack."},{e:"Now",t:"48hr move",b:"Try Sarvam API today. Your HelloPM AI cert plus actual API usage equals a very strong application signal."}],
+   questions:[{c:"India AI",q:"What is the biggest opportunity Sarvam has that OpenAI cannot capture in India?",h:"Data sovereignty, Indian language depth, government trust, and price sensitivity."},{c:"AI PM",q:"How would you translate a new language model capability into a product feature?",h:"Discovery to capability mapping to use case prioritisation to PRD."},{c:"BD to PM",q:"You have sold enterprise SaaS in India. How does that help you build Sarvam enterprise AI products?",h:"Procurement, legal requirements, data localisation, what Indian CIOs care about."},{c:"Strategic",q:"Should Sarvam focus on developers, enterprise, or consumers first?",h:"No right answer — show strategic thinking. Developer ecosystem builds moat; enterprise pays bills; consumer builds brand."}],
+   pms:[{n:"Vivek Raghavan",r:"Co-Founder and CEO",t:"pm",nt:"Ex-NPCI (UPI creator). Very active on LinkedIn."},{n:"Pratyush Kumar",r:"Co-Founder",t:"pm",nt:"Ex-Microsoft Research. AI researcher turned founder."}],
+   connections:[{n:"Peak XV network",r:"Peak XV is an investor",t:"cn",nt:"Strong PM community across Peak XV portfolio."},{n:"Bengaluru AI community",r:"IIT and IISc alumni network",t:"cn",nt:"Academic AI community in Bengaluru."}],
+   careers:"sarvam.ai/careers",li_people:"https://www.linkedin.com/company/sarvam-ai/people/",li_jobs:"https://www.linkedin.com/company/sarvam-ai/jobs/"},
+
+  {id:204,company:"Postman",role:"Product Manager",level:"pm",location:"Bengaluru / SF / Remote",remote:true,salary:"25-40 LPA",posted:"Jun 12",
+   tagline:"The world's leading API platform used by 30M+ developers",sector:"Developer Tools / API",stage:"Series D",amount:"$433M",investors:["Insight Partners","Coatue","Battery Ventures"],
+   snippet:"Postman has its largest engineering team in Bengaluru. Your BrowserStack experience selling to the same developer audience is a perfect match.",
+   jd_summary:"Own product areas across Postman API platform — collections, testing, monitoring, or enterprise features. Run discovery with developers, write specs, drive adoption metrics.",
+   why:"Postman is one of the few tech companies with genuine dual HQs in Bengaluru and SF. Your BrowserStack experience means you have sold to the exact same developers who use Postman every day.",
+   what_building:[{t:"API collections and testing",b:"Core product — developers build, test, and document APIs. 30M+ users."},{t:"Postman Flows",b:"Visual API workflow builder — no-code way to chain API calls."},{t:"Postman AI",b:"AI-assisted API design, test generation, and documentation."},{t:"Enterprise governance",b:"Centralised API management, versioning, and security for large orgs."}],
+   gtm:[{n:1,t:"Developer PLG",b:"Free download, instant value — Postman is the default API tool. Word of mouth is primary distribution.",tg:"PLG: developer default to team"},{n:2,t:"Land and expand",b:"Teams unlock collaboration; enterprises unlock governance and security.",tg:"Individual to team to enterprise"},{n:3,t:"API Network",b:"Public API directory where companies publish their APIs — drives discovery.",tg:"Network effect: API directory"},{n:4,t:"Certification programs",b:"Postman Student Expert and API certifications build loyalty in the next generation.",tg:"Education-led community"}],
+   angle:[{e:"Target",t:"Your BD angle",b:"You have sold BrowserStack to developers — same exact buyer as Postman. You understand what makes a developer champion a tool internally and how to get it approved by IT. That is the entire Postman enterprise motion."},{e:"Outreach",t:"Outreach",b:"Apply via postman.com/company/careers. Lead with your BrowserStack experience: I spent 18 months selling developer tools to the same engineering teams that use Postman."},{e:"Pitch",t:"What to pitch",b:"The onboarding experience for new developers — it is overwhelming. A discovery sprint with junior developers reveals where they drop off before their first API call."},{e:"Now",t:"48hr move",b:"Download Postman and make your first API call. Screenshot the friction — that is your interview talking point."}],
+   questions:[{c:"Developer empathy",q:"A developer uses Postman for the first time. What is the most likely point where they get confused or frustrated?",h:"Show genuine product usage — first API call setup, environment variables, and team collaboration are common friction points."},{c:"BD to PM",q:"You sold BrowserStack to engineering teams. What does that tell you about building developer tools?",h:"Developers hate friction, trust peers not marketing, adopt tools that give instant value."},{c:"AI features",q:"How would you prioritise which AI features to build into Postman next?",h:"Interview developers about workflow pain, map to AI capabilities, prioritise by adoption potential."},{c:"Metrics",q:"What does a successful first week look like for a new Postman user?",h:"First API call, first collection created, first test written — activation milestones that predict retention."}],
+   pms:[{n:"Abhinav Asthana",r:"Co-Founder and CEO",t:"pm",nt:"Active on LinkedIn."},{n:"Bengaluru PM team",r:"Search: Postman + Product Manager + Bengaluru",t:"pm",nt:"Large visible team in Bengaluru."}],
+   connections:[{n:"BrowserStack to Postman",r:"Same developer buyer base",t:"cn",nt:"Your BrowserStack contacts likely know Postman PMs."},{n:"Insight Partners portfolio",r:"Insight Partners is an investor",t:"cn",nt:"Strong B2B SaaS PM community."}],
+   careers:"postman.com/company/careers",li_people:"https://www.linkedin.com/company/postman-platform/people/",li_jobs:"https://www.linkedin.com/company/postman-platform/jobs/"},
+
+  {id:205,company:"Groww",role:"Associate Product Manager",level:"apm",location:"Bengaluru, India",remote:false,salary:"20-28 LPA",posted:"Jun 11",
+   tagline:"India's largest retail investment platform — 10M+ active investors",sector:"FinTech / WealthTech",stage:"Series F",amount:"$733M",investors:["Tiger Global","Sequoia India","Y Combinator","Ribbit Capital"],
+   snippet:"Groww APM roles mean working at massive consumer scale. Every feature ships to millions of first-time investors across India.",
+   jd_summary:"Work on investment product surfaces — onboarding, portfolio, discovery, or payments. Strong analytical skills required. Passion for financial inclusion and consumer product at scale.",
+   why:"Your Salesforce and Anaplan experience with financial services clients gives you domain credibility that most APM candidates lack. Bengaluru-based, perfect location match.",
+   what_building:[{t:"Stock and MF investing",b:"Core product for 10M+ active retail investors — simplified buying and tracking."},{t:"Groww Pay",b:"UPI payments integrated into the investment app — cross-sell growth lever."},{t:"Groww Digest",b:"Financial education and news for first-time investors."},{t:"Loan against securities",b:"Lending against portfolio — new credit product for existing investors."}],
+   gtm:[{n:1,t:"Simplicity as positioning",b:"Investing made simple — every feature optimises for the first-time investor.",tg:"Positioning: simplicity for new investors"},{n:2,t:"Referral-led growth",b:"Strong referral program — every investor brings in friends and family. High viral coefficient in Tier 2 and 3 cities.",tg:"Viral: referral and word-of-mouth"},{n:3,t:"Education content",b:"YouTube and in-app content teaches investing basics — builds trust and drives acquisition.",tg:"Content-led: education to activation"},{n:4,t:"UPI as hook",b:"Groww Pay brings users in for payments then cross-sells investing.",tg:"Cross-sell: payments to investing"}],
+   angle:[{e:"Target",t:"Your BD angle",b:"You have financial services B2B experience at Anaplan and Salesforce. You understand how financial institutions think about product and compliance — rare in a consumer fintech APM candidate."},{e:"Outreach",t:"Outreach",b:"Apply via groww.in/groww-careers. Reference your financial services experience and frame it as: I want to help bring those institutional-grade tools to every Indian."},{e:"Pitch",t:"What to pitch",b:"The investor education experience — first-time investors are scared of losing money. Map where fear kills the first investment and design an experience that converts curiosity into confidence."},{e:"Now",t:"48hr move",b:"Create a Groww account and go through onboarding as a first-time investor. Map every friction point."}],
+   questions:[{c:"Consumer product",q:"What is the biggest product risk of designing for first-time investors?",h:"Over-simplification erodes trust; complexity loses them. Show you understand the tension."},{c:"Financial domain",q:"How would you help a first-time investor make their first investment without feeling overwhelmed?",h:"Guided flows, sensible defaults, social proof, small amounts."},{c:"Metrics",q:"What metrics would you track for the new user activation funnel?",h:"Account opened, KYC completed, first investment made, second investment made."},{c:"BD to PM",q:"You have sold financial software to enterprises. How does that help you build consumer fintech?",h:"Regulatory constraints, trust requirements in financial decisions, role of data in financial products."}],
+   pms:[{n:"Lalit Keshre",r:"Co-Founder and CEO",t:"pm",nt:"Active on LinkedIn."},{n:"Harsh Jain",r:"Co-Founder and COO",t:"pm",nt:"Search: Groww product team on LinkedIn."}],
+   connections:[{n:"Groww APM alumni",r:"Search: Groww + Associate Product Manager",t:"cn",nt:"Active alumni community in Bengaluru fintech."},{n:"Sequoia India fintech network",r:"Sequoia India is an investor",t:"cn",nt:"Strong fintech PM community."}],
+   careers:"groww.in/groww-careers",li_people:"https://www.linkedin.com/company/groww/people/",li_jobs:"https://www.linkedin.com/company/groww/jobs/"},
+
+  {id:206,company:"Linear",role:"Product Manager",level:"pm",location:"Remote (Global)",remote:true,salary:"$130K-$160K",posted:"Jun 14",
+   tagline:"Issue tracking and project management for high-performance engineering teams",sector:"Developer Tools / SaaS",stage:"Series B",amount:"$52M",investors:["Accel","Sequoia"],
+   snippet:"Small high-conviction team. PM roles here are rare and high-impact. You own entire product areas with minimal process overhead.",
+   jd_summary:"Own product areas end-to-end. Deep user research with engineering teams, write specs, ship fast. Linear values strong product taste over process.",
+   why:"Linear ships extremely fast with a tiny team. No APM bureaucracy — you own things from day one. Your enterprise B2B background means you understand the dev team buyers Linear targets.",
+   what_building:[{t:"Issue tracker",b:"Fast keyboard-first issue tracking — the anti-Jira. Beloved by engineering teams globally."},{t:"Linear Projects",b:"Lightweight project planning synced with issues — roadmapping without overhead."},{t:"Linear Docs",b:"Documentation next to your issues — competing with Notion in the dev workflow."},{t:"Linear Asks",b:"Request management for non-engineering teams to submit work to product and eng."}],
+   gtm:[{n:1,t:"Developer word-of-mouth",b:"Engineering teams discover Linear organically. Spreads person to person within companies.",tg:"Pure PLG: developer word-of-mouth"},{n:2,t:"Brand and design",b:"Linear design quality is the product. Attracts high-taste engineering orgs.",tg:"Brand-led: design as distribution"},{n:3,t:"Integration ecosystem",b:"Deep integrations with GitHub, Figma, Slack, and Sentry — Linear becomes the hub.",tg:"Ecosystem: integrations as moat"},{n:4,t:"Enterprise expansion",b:"Teams upgrade to enterprise for SSO, audit, and advanced workflows.",tg:"Land small, expand company-wide"}],
+   angle:[{e:"Target",t:"Your BD angle",b:"Linear buyers are engineering leaders who hate bad UX. Your BD background means you understand what makes technical buyers champion a tool internally — which is exactly the insight Linear needs for enterprise expansion."},{e:"Outreach",t:"Outreach",b:"Apply via linear.app/careers. Show you use Linear — reference a specific keyboard shortcut or missing feature. They will know immediately if you have actually used the product."},{e:"Pitch",t:"What to pitch",b:"The enterprise admin and SSO experience — the weakest part of an otherwise exceptional UX. Your discovery skills can map what IT buyers need to approve Linear company-wide."},{e:"Now",t:"48hr move",b:"Sign up for Linear free tier today. Use it for a week before applying — product taste is their primary filter."}],
+   questions:[{c:"Product taste",q:"What is one thing Linear does exceptionally well and one thing you would fix?",h:"Show genuine product taste. They will see through generic answers — be specific and opinionated."},{c:"User research",q:"How would you decide what to build next for the enterprise segment?",h:"Discovery sprint with IT admins and engineering managers. Map the gap between what devs love and what IT needs to approve."},{c:"Technical",q:"How do you build credibility with highly technical users as a non-engineer PM?",h:"Deep user research habits and comfort with engineering conversations."},{c:"Prioritisation",q:"Linear ships extremely fast with a tiny team. How do you decide what NOT to build?",h:"Strong prioritisation frameworks. Show you can say no."}],
+   pms:[{n:"Karri Saarinen",r:"Co-Founder and CEO",t:"pm",nt:"Very active on X — share your product thoughts there."},{n:"Tuomas Artman",r:"Co-Founder and CTO",t:"pm",nt:"Technical co-founder — follow his work."}],
+   connections:[{n:"Linear community on X",r:"Very active community — engage with Linear posts",t:"cn",nt:"X is the best channel for Linear community."},{n:"Accel portfolio PMs",r:"Accel is an investor",t:"cn",nt:"Accel portfolio PM community."}],
+   careers:"linear.app/careers",li_people:"https://www.linkedin.com/company/linear-app/people/",li_jobs:"https://www.linkedin.com/company/linear-app/jobs/"},
+
+  {id:207,company:"Hasura",role:"Product Manager",level:"pm",location:"Bengaluru / Remote",remote:true,salary:"22-38 LPA",posted:"Jun 10",
+   tagline:"Instant GraphQL and REST APIs on your database — used by 60K+ companies",sector:"Developer Tools / API Infrastructure",stage:"Series C",amount:"$100M",investors:["Lightspeed","Nexus","Vertex Ventures"],
+   snippet:"Bengaluru-founded, globally deployed, remote-first. PM roles here are globally impactful from India. Your developer tools sales experience at BrowserStack is the perfect background.",
+   jd_summary:"Own product areas across API platform — developer experience, enterprise features, or AI integrations. Strong empathy for developers and data engineers required.",
+   why:"Hasura is Bengaluru-founded with global deployment. Your developer tools sales experience at BrowserStack is directly relevant — same buyer, same pain points.",
+   what_building:[{t:"Hasura GraphQL Engine",b:"Open source engine giving instant GraphQL APIs over any database. 60K+ companies."},{t:"Hasura DDN",b:"New architecture: semantic layer for all data sources — evolution beyond databases."},{t:"Hasura AI",b:"AI-assisted query generation and API documentation."},{t:"Enterprise features",b:"SSO, rate limiting, caching, and observability for large-scale deployments."}],
+   gtm:[{n:1,t:"Open source as distribution",b:"Free open source engine with 30K+ GitHub stars. Developers discover and adopt without sales interaction.",tg:"OSS-led: GitHub stars to enterprise"},{n:2,t:"Cloud and enterprise upsell",b:"Managed cloud version and enterprise features convert open source users.",tg:"Land OSS, convert to cloud"},{n:3,t:"Developer community",b:"Active Discord, docs, and tutorials — community is the primary retention engine.",tg:"Community-led: docs and Discord"},{n:4,t:"SI partnerships",b:"GSIs like Deloitte and Accenture deploy Hasura for enterprise clients.",tg:"Partner-led: GSI deployment"}],
+   angle:[{e:"Target",t:"Your BD angle",b:"You sold developer tools at BrowserStack. You know that developers are the buyer, the user, and the champion all in one — and how to build products that serve all three roles. That is Hasura entire go-to-market."},{e:"Outreach",t:"Outreach",b:"Apply via hasura.io/careers. Bonus: contribute a question or answer on Hasura Discord before applying — shows genuine community engagement."},{e:"Pitch",t:"What to pitch",b:"The open source to cloud upgrade path — developers love the OSS version but the upgrade path to managed cloud is confusing. Discovery sprint with developers who churned during upgrade."},{e:"Now",t:"48hr move",b:"Set up Hasura locally with Docker in 5 minutes. Experience the developer onboarding firsthand."}],
+   questions:[{c:"Developer tools",q:"What makes a developer tool go viral in a team? How would you apply that to Hasura?",h:"Instant value, shareability, integration into existing workflows."},{c:"OSS PM",q:"Hasura is open source. How do you balance community requests vs enterprise revenue needs?",h:"What builds the ecosystem vs what drives revenue. Show you can hold both."},{c:"Technical",q:"A data engineer wants Hasura but their team uses REST not GraphQL. How do you handle this as a PM?",h:"Hasura supports REST too — show product empathy for the concern."},{c:"Metrics",q:"How would you measure the health of Hasura open source community?",h:"GitHub stars growth, active contributors, Discord WAU, docs page views."}],
+   pms:[{n:"Tanmai Gopal",r:"Co-Founder and CEO",t:"pm",nt:"Active on LinkedIn and Twitter."},{n:"Rajoshi Ghosh",r:"Co-Founder and COO",t:"pm",nt:"Strong LinkedIn presence."}],
+   connections:[{n:"Hasura community on Discord",r:"Most active channel",t:"cn",nt:"Join discord.gg/hasura and engage."},{n:"Lightspeed India portfolio",r:"Lightspeed is an investor",t:"cn",nt:"Strong developer tools PM community."}],
+   careers:"hasura.io/careers",li_people:"https://www.linkedin.com/company/hasura/people/",li_jobs:"https://www.linkedin.com/company/hasura/jobs/"},
+
+  {id:208,company:"Loom",role:"Associate Product Manager",level:"apm",location:"Remote / US",remote:true,salary:"$110K-$135K",posted:"Jun 15",
+   tagline:"Async video messaging for teams — now part of Atlassian",sector:"Productivity / Video",stage:"Acquired",amount:"$975M acquisition",investors:["Atlassian","Sequoia","Kleiner Perkins"],
+   snippet:"Post-Atlassian acquisition, Loom is integrating into Jira, Confluence, and Trello. APM roles touch both the standalone product and Atlassian's 300K+ customer base.",
+   jd_summary:"Work on async video features and Atlassian integrations. Run user research with distributed teams, write PRDs. Ideal for someone with strong communication skills and empathy for remote workers.",
+   why:"Post-acquisition means lots of integration PM work. Your BrowserStack experience with distributed dev teams is directly relevant to Loom's core user base.",
+   what_building:[{t:"Async video messaging",b:"Record and share video instead of meetings — core product used by 25M+ people."},{t:"Atlassian integration",b:"Loom videos embedded in Jira, Confluence, and Trello cards — the post-acquisition strategic bet."},{t:"AI features",b:"AI summaries, transcripts, and chaptering — making async video searchable."},{t:"Enterprise admin",b:"Enterprise controls, analytics, and workspace management."}],
+   gtm:[{n:1,t:"PLG through Atlassian",b:"Atlassian's 300K+ customers are primary distribution — Loom surfaced inside Jira and Confluence.",tg:"Parent-led: Atlassian marketplace"},{n:2,t:"Bottom-up adoption",b:"Individual users install Loom, share videos, whole team adopts — classic PLG viral loop.",tg:"Viral: every video shared is a demo"},{n:3,t:"Enterprise upsell",b:"Free tier converts to enterprise via admin controls, analytics, and SSO.",tg:"Feature-gated enterprise upgrade"},{n:4,t:"Integration stickiness",b:"Deeper Loom embeds into Jira and Confluence workflows, harder to rip out.",tg:"Integration as retention moat"}],
+   angle:[{e:"Target",t:"Your BD angle",b:"You sold BrowserStack to distributed dev teams — exactly Loom core users. You understand the async work pain better than most PMs. Frame yourself as the PM who has lived the problem Loom solves."},{e:"Outreach",t:"Outreach",b:"Apply via atlassian.com/company/careers. Cover note: I spent 18 months selling to distributed engineering teams at BrowserStack — I know exactly where async communication breaks down."},{e:"Pitch",t:"What to pitch",b:"The Jira integration experience — when an engineer records a Loom inside a Jira ticket, the handoff is clunky. You would own making that the smoothest async workflow in the Atlassian ecosystem."},{e:"Now",t:"48hr move",b:"Install Loom today, record a short video, and reference the experience in your application."}],
+   questions:[{c:"Domain",q:"How does async video change the way distributed teams work? What is still broken?",h:"Show you have thought deeply about async communication — not just Loom features but the underlying workflow problem."},{c:"Integration PM",q:"Loom is now part of Atlassian. How do you prioritise a standalone Loom feature vs a Jira integration?",h:"Strategic alignment with parent company goals, user overlap analysis, revenue impact."},{c:"Metrics",q:"How would you measure whether Loom Jira integration is working?",h:"Videos created in Jira context, ticket resolution time, comment reduction, NPS delta."},{c:"Research",q:"Who would you interview to understand Loom biggest product gaps?",h:"Individual ICs and admins and the Jira PM team at Atlassian — multi-stakeholder research."}],
+   pms:[{n:"Joe Thomas",r:"Co-Founder and CEO, Loom",t:"pm",nt:"Active on LinkedIn post-acquisition."},{n:"Atlassian PM team",r:"Search: Atlassian + Product Manager + Loom",t:"pm",nt:"Several PMs on Loom integration visible."}],
+   connections:[{n:"Atlassian alumni network",r:"Large PM community",t:"cn",nt:"Search: Atlassian + product manager + 2nd degree."},{n:"BrowserStack to Atlassian",r:"Both serve dev teams",t:"cn",nt:"Check your BrowserStack contacts for Atlassian connections."}],
+   careers:"atlassian.com/company/careers",li_people:"https://www.linkedin.com/company/atlassian/people/",li_jobs:"https://www.linkedin.com/company/atlassian/jobs/"}
+];
+
+let activeJobFilter = "all";
+let activeJobId = null;
+let activeJobTab = "overview";
+let activePrimary = "radar";
+
+function switchPrimary(tab) {
+  activePrimary = tab;
+  document.getElementById("ptab-radar").classList.toggle("active", tab === "radar");
+  document.getElementById("ptab-jobs").classList.toggle("active", tab === "jobs");
+  document.getElementById("panel-radar").classList.toggle("active", tab === "radar");
+  document.getElementById("panel-jobs").classList.toggle("active", tab === "jobs");
+  if (tab === "jobs") renderJobs();
+}
+
+function filterJobs(btn, filter) {
+  activeJobFilter = filter;
+  document.querySelectorAll("[data-jfilter]").forEach(function(b){ b.classList.remove("active"); });
+  btn.classList.add("active");
+  renderJobs();
+}
+
+function renderJobs() {
+  var q = ((document.getElementById("jobSearch")||{}).value||"").toLowerCase();
+  var list = JOBS.filter(function(j){
+    var mf = activeJobFilter === "all" || j.level === activeJobFilter;
+    var ms = !q || j.company.toLowerCase().includes(q) || j.role.toLowerCase().includes(q) || j.sector.toLowerCase().includes(q);
+    return mf && ms;
+  });
+  var fc = document.getElementById("jfc");
+  if (fc) fc.textContent = list.length + " role" + (list.length === 1 ? "" : "s");
+  var feed = document.getElementById("jobFeed");
+  if (!feed) return;
+  if (list.length === 0) { feed.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:12px;">No roles match.</div>'; return; }
+  feed.innerHTML = list.map(function(j){
+    return '<div class="job-card' + (activeJobId===j.id?' active':'') + '" onclick="showJobDetail(' + j.id + ')">' +
+      '<div class="cr1"><div><div class="jname">' + j.company + '</div><div class="jrole">' + j.role + '</div></div>' +
+      '<div style="display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0;"><span class="jlevel">' + j.level + '</span>' + (j.remote?'<span class="jremote">remote</span>':'') + '</div></div>' +
+      '<div class="jmeta"><span class="jchip"><span class="v">' + j.salary + '</span></span><span class="jchip">' + j.location + '</span><span class="jchip">Posted ' + j.posted + '</span></div>' +
+      '<div class="jsnip">' + j.snippet + '</div>' +
+      '<div class="jhint">&#8627; click for full dossier + resume match</div>' +
+    '</div>';
+  }).join("");
+}
+
+function showJobDetail(id) {
+  activeJobId = id; activeJobTab = "overview";
+  renderJobs();
+  var j = JOBS.find(function(x){ return x.id === id; });
+  if (!j) return;
+  document.getElementById("job-pe").style.display = "none";
+  document.getElementById("job-di").style.display = "block";
+  document.getElementById("job-dp").classList.add("open");
+  renderJobTabs(j); renderJobContent(j);
+  document.getElementById("job-dp").scrollTop = 0;
+}
+
+function renderJobTabs(j) {
+  var JTABS = [{id:"overview",l:"Overview"},{id:"product",l:"Product"},{id:"gtm",l:"GTM"},{id:"angle",l:"My Angle"},{id:"prep",l:"Prep"},{id:"linkedin",l:"LinkedIn"},{id:"match",l:"Resume Match"}];
+  document.getElementById("job-dt").innerHTML = JTABS.map(function(t){
+    return '<div class="detail-tab' + (activeJobTab===t.id?' active':'') + '" onclick="switchJobTab(\'' + t.id + '\')">' + t.l + '</div>';
+  }).join("");
+  document.getElementById("job-ab").innerHTML =
+    '<a href="https://' + j.careers + '" target="_blank" class="ab pr">Apply now &#8599;</a>' +
+    '<a href="' + j.li_people + '" target="_blank" class="ab se">People &#8599;</a>' +
+    '<a href="' + j.li_jobs + '" target="_blank" class="ab gh">LI Jobs &#8599;</a>' +
+    '<button class="ab" style="background:var(--purple-dim);color:var(--purple);border-color:rgba(167,139,250,0.3);" onclick="showCLModalForJob(' + j.id + ')">&#9998; Cover letter</button>';
+}
+
+function switchJobTab(tab) {
+  activeJobTab = tab;
+  var j = JOBS.find(function(x){ return x.id === activeJobId; });
+  if (j) { renderJobTabs(j); renderJobContent(j); }
+  var db = document.getElementById("job-db");
+  if (db) db.scrollTop = 0;
+}
+
+function showCLModalForJob(id) {
+  var j = JOBS.find(function(x){ return x.id === id; });
+  if (!j) return;
+  document.getElementById("clCompanyName").textContent = j.company + " - " + j.role;
+  document.getElementById("clEmptyText").textContent = "Your tailored cover letter for " + j.role + " at " + j.company + " will appear here.";
+  document.getElementById("clEmpty").style.display = "flex";
+  document.getElementById("clLetter").style.display = "none";
+  document.getElementById("clLetter").textContent = "";
+  document.getElementById("clStatus").textContent = "Click Generate to write your story-led cover letter.";
+  document.getElementById("clCopyBtn").disabled = true;
+  document.getElementById("clCopyBtn").style.opacity = "0.4";
+  document.getElementById("clModal").style.display = "flex";
+  clCurrentPrompt = "You are a world-class cover letter writer specialising in career transitions into PM roles. " +
+    "Write a story-led cover letter for Vaishnavi Pai applying for " + j.role + " at " + j.company + ". " +
+    "Candidate: 6.5 years enterprise B2B at Adobe Anaplan Salesforce BrowserStack. Completing HelloPM AI PM certification. " +
+    "Role: " + j.jd_summary + ". Why this opening: " + j.why + ". BD angle: " + j.angle[0].b + ". " +
+    "Do NOT open with job title. Open with a vivid moment from her experience showing PM thinking. " +
+    "Second paragraph: why this company specifically. Third paragraph: credibility in 2-3 sentences. " +
+    "Close: one confident sentence. Tone: conversational, no cliches. Under 300 words. " +
+    "Start: Dear [Hiring Manager Name], End: Warm regards, Vaishnavi Pai | vaishnavi.p.we@gmail.com | linkedin.com/in/vaishnavi-pai-8b6125a4";
+}
+
+function renderJobContent(j) {
+  var db = document.getElementById("job-db");
+  var jobHdr = '<div class="dcname">' + j.company.slice(0,-1) + '<em>' + j.company.slice(-1) + '</em></div>' +
+    '<div style="font-size:14px;font-weight:500;color:var(--teal);margin-bottom:4px;">' + j.role + '</div>' +
+    '<div class="dctag">' + j.tagline + '</div>' +
+    '<div class="dtags"><span class="jlevel">' + j.level + '</span>' + (j.remote?'<span class="jremote">remote</span>':'') +
+    '<span style="font-size:11px;font-family:var(--mono);color:var(--text-muted);padding:3px 8px;">' + j.location + '</span>' +
+    '<span style="font-size:11px;font-family:var(--mono);color:var(--amber);padding:3px 8px;">Posted ' + j.posted + '</span></div>';
+
+  if (activeJobTab === "overview") {
+    db.innerHTML = jobHdr +
+      '<div class="sec"><div class="sl">Role snapshot</div>' +
+      '<div class="stat-grid">' +
+        '<div class="stat-box"><div class="slabel">salary</div><div class="sval" style="font-size:12px;">' + j.salary + '</div></div>' +
+        '<div class="stat-box"><div class="slabel">stage</div><div class="sval w">' + j.stage + '</div></div>' +
+        '<div class="stat-box"><div class="slabel">raised</div><div class="sval">' + j.amount + '</div></div>' +
+      '</div><div class="chips">' + j.investors.map(function(i){return '<span class="chip">'+i+'</span>';}).join("") + '</div></div>' +
+      '<div class="sec"><div class="sl">What the JD is really asking for</div><div class="hb hbl">' + j.jd_summary + '</div></div>' +
+      '<div class="sec"><div class="sl">Why this is your opening</div><div class="hb ht">' + j.why + '</div></div>';
+  } else if (activeJobTab === "product") {
+    db.innerHTML = jobHdr + '<div class="sec"><div class="sl">What they are building</div><div class="feature-grid">' +
+      j.what_building.map(function(f){return '<div class="fc"><div class="ftitle">'+f.t+'</div><div class="fbody">'+f.b+'</div></div>';}).join("") + '</div></div>';
+  } else if (activeJobTab === "gtm") {
+    db.innerHTML = jobHdr + '<div class="sec"><div class="sl">Go-to-market strategy</div>' +
+      j.gtm.map(function(g){return '<div class="gs"><div class="gnum">'+g.n+'</div><div><div class="gtitle">'+g.t+'</div><div class="gbody">'+g.b+'</div><div class="gtag">'+g.tg+'</div></div></div>';}).join("") + '</div>';
+  } else if (activeJobTab === "angle") {
+    db.innerHTML = jobHdr + '<div class="sec"><div class="sl">Your BD-to-PM entry path</div>' +
+      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">' +
+      j.angle.map(function(a){return '<div class="as"><div class="ae">'+a.e+'</div><div><div class="atitle">'+a.t+'</div><div class="abody">'+a.b+'</div></div></div>';}).join("") + '</div></div>';
+  } else if (activeJobTab === "prep") {
+    db.innerHTML = jobHdr + '<div class="sec"><div class="sl">Interview questions to prepare</div>' +
+      j.questions.map(function(q){return '<div class="qi"><div class="qcat">'+q.c+'</div><div class="qtext">'+q.q+'</div><div class="qhint">&#128161; '+q.h+'</div></div>';}).join("") + '</div>';
+  } else if (activeJobTab === "linkedin") {
+    var pms = j.pms.map(function(p){return '<div class="pc"><div class="av pm">'+p.n.split(" ").map(function(x){return x[0];}).join("").slice(0,2)+'</div><div class="pi"><div class="pname">'+p.n+'</div><div class="prole">'+p.r+'</div><div class="pnote">'+p.nt+'</div></div><span class="pb pm">PM+</span></div>';}).join("");
+    var cns = j.connections.map(function(p){return '<div class="pc"><div class="av cn">'+p.n.split(" ").slice(0,2).map(function(x){return x[0];}).join("")+'</div><div class="pi"><div class="pname">'+p.n+'</div><div class="prole">'+p.r+'</div><div class="pnote">'+p.nt+'</div></div><span class="pb cn">2nd</span></div>';}).join("");
+    db.innerHTML = jobHdr +
+      '<div class="sec"><div class="sl">People to reach at ' + j.company + '</div>' + pms +
+      '<a href="' + j.li_people + '" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);text-decoration:none;font-family:var(--mono);margin-top:12px;">View people at ' + j.company + ' &#8599;</a></div>' +
+      '<div class="sec"><div class="sl">Warm connection paths</div>' + cns + '</div>' +
+      '<div class="sec"><div class="sl">Cold DM template</div><div class="hb ha" style="font-size:12px;line-height:1.8;">Hi [Name], I noticed ' + j.company + ' is hiring for ' + j.role + ' and I am actively targeting this type of role. I come from a BD background at Adobe, Anaplan, and BrowserStack and am completing my AI PM certification. Would love to hear what the team is working on. Happy to share more context if helpful.</div></div>';
+  } else if (activeJobTab === "match") {
+    var score = 72;
+    var sc = "var(--teal)";
+    db.innerHTML = jobHdr +
+      '<div class="sec"><div class="sl">Match score</div>' +
+      '<div style="display:flex;align-items:center;gap:20px;margin-bottom:16px;">' +
+        '<div style="position:relative;width:80px;height:80px;">' +
+          '<svg viewBox="0 0 80 80" style="width:80px;height:80px;transform:rotate(-90deg);"><circle cx="40" cy="40" r="32" fill="none" stroke="var(--border)" stroke-width="6"/><circle cx="40" cy="40" r="32" fill="none" stroke="'+sc+'" stroke-width="6" stroke-dasharray="145 201" stroke-linecap="round"/></svg>' +
+          '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;"><div style="font-size:18px;font-weight:600;font-family:var(--mono);color:'+sc+';">'+score+'</div></div>' +
+        '</div>' +
+        '<div><div style="font-size:16px;font-weight:500;color:'+sc+';margin-bottom:4px;">Strong match</div>' +
+        '<div style="font-size:12px;color:var(--text-secondary);">Enterprise B2B, discovery, GTM all matched</div>' +
+        '<div style="font-size:12px;color:var(--text-secondary);">Gap: no shipped product yet (HelloPM capstone addresses this)</div></div>' +
+      '</div>' +
+      '<div class="hb ht" style="font-size:12px;line-height:1.7;"><strong>Your strongest cards for this role:</strong> Enterprise B2B discovery, GTM strategy, stakeholder mapping, and use-case translation are all directly evidenced across your 6.5 years. The HelloPM certification in progress directly addresses the formal PM experience gap. Your BD-to-PM story is compelling for ' + j.company + ' specifically because ' + j.why + '</div></div>';
+  }
+}
+
 </script>
 
 <!-- COVER LETTER MODAL -->
@@ -1190,6 +1489,41 @@ document.addEventListener("DOMContentLoaded", function() {
     </div>
     <div style="padding:10px 24px;border-top:1px solid rgba(255,255,255,0.07);">
       <div style="font-size:11px;color:#4E5A70;font-family:'JetBrains Mono',monospace;">Tip: the letter is fully editable — click any line to adjust before sending. Generate again for a different story hook.</div>
+    </div>
+  </div>
+</div>
+</div><!-- end panel-radar -->
+
+<div id="panel-jobs" class="section-panel">
+  <div class="jobs-filters">
+    <span class="filter-label">level //</span>
+    <button class="filter-btn active" data-jfilter="all" onclick="filterJobs(this,'all')">All entry-level</button>
+    <button class="filter-btn" data-jfilter="apm" onclick="filterJobs(this,'apm')">APM</button>
+    <button class="filter-btn" data-jfilter="associate" onclick="filterJobs(this,'associate')">Associate PM</button>
+    <button class="filter-btn" data-jfilter="pm" onclick="filterJobs(this,'pm')">Product Manager</button>
+    <div class="search-wrap" style="margin-left:auto;">
+      <span class="si">&#8981;</span>
+      <input type="text" id="jobSearch" placeholder="Search roles..." oninput="renderJobs()"/>
+    </div>
+  </div>
+  <div class="main">
+    <div class="feed">
+      <div class="feed-header">
+        <span class="feed-title">PM roles globally</span>
+        <span class="feed-count" id="jfc">8 roles</span>
+      </div>
+      <div id="jobFeed"></div>
+    </div>
+    <div class="detail-panel" id="job-dp">
+      <div class="panel-empty" id="job-pe">
+        <div class="panel-empty-icon">&#128188;</div>
+        <p>Click any role to see the company dossier, your angle, interview prep, and resume match.</p>
+      </div>
+      <div id="job-di" style="display:none;">
+        <div class="detail-tabs" id="job-dt"></div>
+        <div class="detail-body" id="job-db"></div>
+        <div class="action-bar" id="job-ab"></div>
+      </div>
     </div>
   </div>
 </div>
