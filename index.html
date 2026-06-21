@@ -763,38 +763,59 @@ function getTailoredEdits(cid, score) {
 
 const LI_LINKS = {
   "Odyssey": {
-    people: "https://www.linkedin.com/company/odyssey-ai-inc/people/",
-    jobs: "https://www.linkedin.com/company/odyssey-ai-inc/jobs/"
+    people: "https://www.linkedin.com/company/odysseyml/people/",
+    jobs: "https://www.linkedin.com/company/odysseyml/jobs/",
+    search: "https://www.linkedin.com/search/results/companies/?keywords=Odyssey+AI+world+model"
   },
   "Behavox": {
     people: "https://www.linkedin.com/company/behavox/people/",
-    jobs: "https://www.linkedin.com/company/behavox/jobs/"
+    jobs: "https://www.linkedin.com/company/behavox/jobs/",
+    search: "https://www.linkedin.com/search/results/companies/?keywords=Behavox+compliance"
   },
   "Forage": {
     people: "https://www.linkedin.com/company/joinforage/people/",
-    jobs: "https://www.linkedin.com/company/joinforage/jobs/"
+    jobs: "https://www.linkedin.com/company/joinforage/jobs/",
+    search: "https://www.linkedin.com/search/results/companies/?keywords=Forage+fintech+benefits"
   },
   "PointFive": {
-    people: "https://www.linkedin.com/company/point-five/people/",
-    jobs: "https://www.linkedin.com/company/point-five/jobs/"
+    people: "https://www.linkedin.com/company/pointfive-us/people/",
+    jobs: "https://www.linkedin.com/company/pointfive-us/jobs/",
+    search: "https://www.linkedin.com/search/results/companies/?keywords=PointFive+cloud+cost"
   },
   "Coralogix": {
     people: "https://www.linkedin.com/company/coralogix/people/",
-    jobs: "https://www.linkedin.com/company/coralogix/jobs/"
+    jobs: "https://www.linkedin.com/company/coralogix/jobs/",
+    search: "https://www.linkedin.com/search/results/companies/?keywords=Coralogix+observability"
   },
   "PhysicsX": {
     people: "https://www.linkedin.com/company/physicsx/people/",
-    jobs: "https://www.linkedin.com/company/physicsx/jobs/"
+    jobs: "https://www.linkedin.com/company/physicsx/jobs/",
+    search: "https://www.linkedin.com/search/results/companies/?keywords=PhysicsX+simulation"
   },
   "Twenty Technologies": {
-    people: "https://www.linkedin.com/company/twenty-technologies/people/",
-    jobs: "https://www.linkedin.com/company/twenty-technologies/jobs/"
+    people: null,
+    jobs: null,
+    search: "https://www.linkedin.com/search/results/companies/?keywords=Twenty+Technologies+cybersecurity"
   },
   "Invisible Narratives": {
-    people: "https://www.linkedin.com/company/invisible-narratives/people/",
-    jobs: "https://www.linkedin.com/company/invisible-narratives/jobs/"
+    people: null,
+    jobs: null,
+    search: "https://www.linkedin.com/search/results/companies/?keywords=Invisible+Narratives+storytelling"
   }
 };
+
+function getLiPeople(name) {
+  const li = LI_LINKS[name] || {};
+  return li.people || li.search || ("https://www.linkedin.com/search/results/companies/?keywords=" + encodeURIComponent(name));
+}
+function getLiJobs(name) {
+  const li = LI_LINKS[name] || {};
+  return li.jobs || ("https://www.linkedin.com/jobs/search/?keywords=Product+Manager+" + encodeURIComponent(name));
+}
+function getLiSearch(name) {
+  const li = LI_LINKS[name] || {};
+  return li.search || ("https://www.linkedin.com/search/results/companies/?keywords=" + encodeURIComponent(name));
+}
 
 let af="all", aid=null, at="overview", activeWeek="current";
 const TABS=[{id:"overview",l:"Overview"},{id:"product",l:"Product"},{id:"gtm",l:"GTM"},{id:"angle",l:"My Angle"},{id:"prep",l:"Prep"},{id:"linkedin",l:"LinkedIn"},{id:"match",l:"Resume Match"}];
@@ -896,13 +917,10 @@ function renderTabs(c) {
     `<button class="status-btn ${s.key}${status===s.key?" active-status":""}" style="padding:4px 10px;font-size:11px;" onclick="setStatus(${c.id},'${week}','${s.key}')">${s.label}</button>`
   ).join("");
 
-  const _li = LI_LINKS[c.name] || {};
-  const _liPeople = _li.people || ("https://www.linkedin.com/search/results/people/?keywords=" + encodeURIComponent(c.name));
-  const _liJobs = _li.jobs || ("https://www.linkedin.com/jobs/search/?keywords=Product+Manager+" + encodeURIComponent(c.name));
   document.getElementById("ab").innerHTML = `
     <a href="https://${c.careers}" target="_blank" class="ab pr">Open roles &#8599;</a>
-    <a href="${_liPeople}" target="_blank" class="ab se">People &#8599;</a>
-    <a href="${_liJobs}" target="_blank" class="ab gh">LI Jobs &#8599;</a>
+    <a href="${getLiPeople(c.name)}" target="_blank" class="ab se" title="${LI_LINKS[c.name]&&LI_LINKS[c.name].people?'Company People page':'Search on LinkedIn'}">&#x1f465; People &#8599;</a>
+    <a href="${getLiSearch(c.name)}" target="_blank" class="ab gh">&#x1f50d; Find on LI &#8599;</a>
     <button class="ab" style="background:var(--purple-dim);color:var(--purple);border-color:rgba(167,139,250,0.3);" onclick="showCLModal(${c.id})">&#9998; Cover letter</button>
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;width:100%;">${statusHtml}</div>`;
 }
@@ -1012,7 +1030,7 @@ function renderContent(c){
     const cns=c.connections.map(p=>`<div class="pc"><div class="av cn">${p.n.split(" ").slice(0,2).map(x=>x[0]).join("")}</div><div class="pi"><div class="pname">${p.n}</div><div class="prole">${p.r}</div><div class="pnote">${p.nt}</div></div><span class="pb cn">2nd&#176;</span></div>`).join("");
     db.innerHTML=hdr(c)+`
       <div class="sec"><div class="sl">PMs &amp; above at ${c.name}</div>${pms}
-        <a href="${(LI_LINKS[c.name]||{}).people||'https://www.linkedin.com/search/results/people/?keywords='+encodeURIComponent(c.name)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);text-decoration:none;font-family:var(--mono);margin-top:12px;">&#x1f465; View all people at ${c.name} &#8599;</a>
+        <a href="${getLiPeople(c.name)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);text-decoration:none;font-family:var(--mono);margin-top:12px;">&#x1f465; View people at ${c.name} on LinkedIn &#8599;</a><br><a href="${getLiSearch(c.name)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);text-decoration:none;font-family:var(--mono);margin-top:6px;">&#x1f50d; Find ${c.name} company page &#8599;</a>
       </div>
       <div class="sec"><div class="sl">Warm connection paths</div>${cns}
         <a href="https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(c.name)}&network=%5B%22S%22%5D" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);text-decoration:none;font-family:var(--mono);margin-top:12px;">&#x1f91d; Find 2nd&#176; connections at ${c.name} &#8599;</a>
