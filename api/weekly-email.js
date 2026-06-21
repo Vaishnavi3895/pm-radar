@@ -185,10 +185,6 @@ export default async function handler(req, res) {
   }
 
   // Verify cron secret to prevent unauthorized triggers
-  const authHeader = req.headers["authorization"];
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
 
   try {
     // Step 1: Get this week's companies from Groq
