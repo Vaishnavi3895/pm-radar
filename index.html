@@ -760,6 +760,42 @@ function getTailoredEdits(cid, score) {
 }
 
 // ─── APP STATE ───────────────────────────────────────────────────────────────
+
+const LI_LINKS = {
+  "Odyssey": {
+    search: "https://www.linkedin.com/search/results/people/?keywords=Odyssey+AI+world+model&titleFreeText=Product+Manager",
+    jobs: "https://www.linkedin.com/jobs/search/?keywords=Product+Manager+Odyssey+AI"
+  },
+  "Behavox": {
+    search: "https://www.linkedin.com/search/results/people/?keywords=Behavox&titleFreeText=Product+Manager",
+    jobs: "https://www.linkedin.com/jobs/search/?keywords=Product+Manager+Behavox"
+  },
+  "Forage": {
+    search: "https://www.linkedin.com/search/results/people/?keywords=Forage+fintech+benefits&titleFreeText=Product",
+    jobs: "https://www.linkedin.com/jobs/search/?keywords=Product+Manager+Forage+fintech"
+  },
+  "PointFive": {
+    search: "https://www.linkedin.com/search/results/people/?keywords=PointFive+cloud+cost&titleFreeText=Product",
+    jobs: "https://www.linkedin.com/jobs/search/?keywords=Product+Manager+PointFive"
+  },
+  "Coralogix": {
+    search: "https://www.linkedin.com/search/results/people/?keywords=Coralogix&titleFreeText=Product+Manager",
+    jobs: "https://www.linkedin.com/jobs/search/?keywords=Product+Manager+Coralogix"
+  },
+  "PhysicsX": {
+    search: "https://www.linkedin.com/search/results/people/?keywords=PhysicsX+simulation&titleFreeText=Product",
+    jobs: "https://www.linkedin.com/jobs/search/?keywords=Product+Manager+PhysicsX"
+  },
+  "Twenty Technologies": {
+    search: "https://www.linkedin.com/search/results/people/?keywords=%22Twenty+Technologies%22+cybersecurity&titleFreeText=Product",
+    jobs: "https://www.linkedin.com/jobs/search/?keywords=Product+Manager+%22Twenty+Technologies%22+cybersecurity"
+  },
+  "Invisible Narratives": {
+    search: "https://www.linkedin.com/search/results/people/?keywords=%22Invisible+Narratives%22&titleFreeText=Product",
+    jobs: "https://www.linkedin.com/jobs/search/?keywords=Product+Manager+%22Invisible+Narratives%22"
+  }
+};
+
 let af="all", aid=null, at="overview", activeWeek="current";
 const TABS=[{id:"overview",l:"Overview"},{id:"product",l:"Product"},{id:"gtm",l:"GTM"},{id:"angle",l:"My Angle"},{id:"prep",l:"Prep"},{id:"linkedin",l:"LinkedIn"},{id:"match",l:"Resume Match"}];
 const STATUSES = [{key:"interested",label:"Interested"},{key:"contacted",label:"Contacted"},{key:"in-conversation",label:"In Conversation"},{key:"passed",label:"Passed"}];
@@ -860,10 +896,13 @@ function renderTabs(c) {
     `<button class="status-btn ${s.key}${status===s.key?" active-status":""}" style="padding:4px 10px;font-size:11px;" onclick="setStatus(${c.id},'${week}','${s.key}')">${s.label}</button>`
   ).join("");
 
+  const _li = LI_LINKS[c.name] || {};
+  const _liSearch = _li.search || ("https://www.linkedin.com/search/results/people/?keywords=" + encodeURIComponent(c.name) + "+product+manager&titleFreeText=Product");
+  const _liJobs = _li.jobs || ("https://www.linkedin.com/jobs/search/?keywords=Product+Manager+" + encodeURIComponent(c.name));
   document.getElementById("ab").innerHTML = `
     <a href="https://${c.careers}" target="_blank" class="ab pr">Open roles &#8599;</a>
-    <a href="https://linkedin.com/search/results/people/?keywords=${encodeURIComponent(c.name+" product manager")}" target="_blank" class="ab se">Find PMs &#8599;</a>
-    <a href="https://linkedin.com/search/results/people/?keywords=${encodeURIComponent(c.name)}&network=%5B%22S%22%5D" target="_blank" class="ab gh">2nd&#176; &#8599;</a>
+    <a href="${_liSearch}" target="_blank" class="ab se">Find PMs &#8599;</a>
+    <a href="${_liJobs}" target="_blank" class="ab gh">PM Jobs &#8599;</a>
     <button class="ab" style="background:var(--purple-dim);color:var(--purple);border-color:rgba(167,139,250,0.3);" onclick="showCLModal(${c.id})">&#9998; Cover letter</button>
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;width:100%;">${statusHtml}</div>`;
 }
@@ -973,10 +1012,10 @@ function renderContent(c){
     const cns=c.connections.map(p=>`<div class="pc"><div class="av cn">${p.n.split(" ").slice(0,2).map(x=>x[0]).join("")}</div><div class="pi"><div class="pname">${p.n}</div><div class="prole">${p.r}</div><div class="pnote">${p.nt}</div></div><span class="pb cn">2nd&#176;</span></div>`).join("");
     db.innerHTML=hdr(c)+`
       <div class="sec"><div class="sl">PMs &amp; above at ${c.name}</div>${pms}
-        <a href="https://linkedin.com/search/results/people/?keywords=${encodeURIComponent(c.name+" product manager")}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);text-decoration:none;font-family:var(--mono);margin-top:12px;">Search all PMs at ${c.name} &#8599;</a>
+        <a href="https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(c.name)}&titleFreeText=Product+Manager&origin=FACETED_SEARCH" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);text-decoration:none;font-family:var(--mono);margin-top:12px;">Search all PMs at ${c.name} &#8599;</a>
       </div>
       <div class="sec"><div class="sl">Warm connection paths</div>${cns}
-        <a href="https://linkedin.com/search/results/people/?keywords=${encodeURIComponent(c.name)}&network=%5B%22S%22%5D" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);text-decoration:none;font-family:var(--mono);margin-top:12px;">Find 2nd&#176; connections at ${c.name} &#8599;</a>
+        <a href="https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(c.name)}&network=%5B%22S%22%5D&titleFreeText=Product" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);text-decoration:none;font-family:var(--mono);margin-top:12px;">Find 2nd&#176; connections at ${c.name} &#8599;</a>
       </div>
       <div class="sec"><div class="sl">Cold DM template</div>
         <div class="hb ha" style="font-size:12px;line-height:1.8;">Hi [Name], I have been following ${c.name}'s work on [specific recent news or product detail]. I come from a BD background and am moving into PM roles — I have been thinking about [specific product or GTM challenge you identified]. Would love to exchange notes for 15 mins if you are open to it.</div>
